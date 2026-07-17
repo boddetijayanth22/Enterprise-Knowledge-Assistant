@@ -20,7 +20,7 @@ Build intelligent document assistants powered by **Semantic Search**, **Vector E
 ---
 
 <p align="center">
-![Uploading gitbanner.png…]()
+<img width="1536" height="1024" alt="gitbanner" src="https://github.com/user-attachments/assets/cc88b03d-f95d-4d09-93ac-9fa14d530620" />
 
 
 </p>
