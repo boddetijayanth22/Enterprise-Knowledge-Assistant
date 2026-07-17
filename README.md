@@ -1,460 +1,264 @@
-<div align="center">
-
 # 🚀 Enterprise Knowledge Assistant
 
-### Production-inspired Retrieval-Augmented Generation (RAG) Application
+<p align="center">
 
-Build intelligent document assistants powered by **Semantic Search**, **Vector Embeddings**, and **Large Language Models**.
+A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application built with <b>FastAPI</b>, <b>Streamlit</b>, <b>Qdrant</b>, <b>Hybrid Search</b>, <b>BM25</b>, and <b>CrossEncoder Re-ranking</b> for intelligent document question answering.
 
----
-
-![Python](https://img.shields.io/badge/Python-3.13-blue?style=for-the-badge&logo=python)
-![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit)
-![Qdrant](https://img.shields.io/badge/Qdrant-DC244C?style=for-the-badge)
-![Google Gemini](https://img.shields.io/badge/Google-Gemini-blueviolet?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)
-
-</div>
-
----
+</p>
 
 <p align="center">
-<img width="1536" height="1024" alt="gitbanner" src="https://github.com/user-attachments/assets/cc88b03d-f95d-4d09-93ac-9fa14d530620" />
 
+![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-Vector%20DB-success)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 </p>
 
 ---
 
-## 📖 Overview
+## 🖥️ Application Preview
 
-**Enterprise Knowledge Assistant** is a production-inspired **Retrieval-Augmented Generation (RAG)** application that enables users to upload, organize, and query PDF documents using natural language.
+> **Replace with your best application screenshot**
 
-Instead of relying solely on the knowledge stored inside a Large Language Model, the application retrieves relevant information from uploaded documents before generating a response. This approach produces grounded, context-aware answers based on the user's own knowledge base.
-
-The project demonstrates the practical implementation of a complete RAG pipeline using modern AI technologies, including semantic chunking, dense vector embeddings, vector search, and Large Language Models.
-
-The application is built with a modular architecture consisting of:
-
-- ⚡ FastAPI Backend
-- 🎨 Streamlit Frontend
-- 🗄️ Qdrant Vector Database
-- 🧠 Sentence Transformers Embedding Model
-- 🤖 Google Gemini LLM
-
-The primary objective of this project is to understand how enterprise document intelligence systems are designed while following clean architecture and modular software engineering principles.
+![Application](assets/home.png)
 
 ---
 
-# 🎯 Project Goals
+## ⭐ Key Highlights
 
-This project was developed to gain hands-on experience with the core components of Retrieval-Augmented Generation (RAG) by building an end-to-end document intelligence application from scratch.
-
-The primary goals include:
-
-- Build a complete Retrieval-Augmented Generation pipeline
-- Understand semantic retrieval using dense embeddings
-- Learn vector databases through Qdrant
-- Integrate Google Gemini for grounded response generation
-- Design a modular FastAPI backend
-- Develop an interactive Streamlit frontend
-- Implement metadata-based document retrieval
-- Prevent duplicate indexing using SHA-256 hashing
-- Establish a strong foundation for future versions involving Hybrid Search, Re-ranking, LangChain, LangGraph, MCP, and Agentic AI
+- ⚡ Hybrid Search (Semantic + BM25)
+- 🎯 CrossEncoder Re-ranking
+- 🧠 Qdrant Vector Database
+- 📄 Intelligent PDF Knowledge Base
+- 💬 Conversational Document QA
+- 📊 Interactive Dashboard
+- 🗂 Persistent Chat History
+- 🏗 Modular FastAPI Architecture
 
 ---
 
-# 📑 Table of Contents
+## 📖 About the Project
 
-- [Overview](#-overview)
-- [Project Goals](#-project-goals)
-- [Application Preview](#-application-preview)
-- [Features](#-features)
-- [System Architecture](#-system-architecture)
-- [RAG Workflow](#-rag-workflow)
-- [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
-- [Configuration](#-configuration)
-- [Usage Guide](#-usage-guide)
-- [REST API](#-rest-api)
-- [Version 1 Progress](#-version-1-progress)
-- [Project Roadmap](#-project-roadmap)
-- [Challenges Solved](#-challenges-solved)
-- [Learning Outcomes](#-learning-outcomes)
-- [Contributing](#-contributing)
-- [License](#-license)
-- [Author](#-author)
+Enterprise Knowledge Assistant is a production-inspired Retrieval-Augmented Generation (RAG) system that enables users to upload PDF documents, build a searchable knowledge base, and ask natural language questions over their content.
+
+Unlike traditional chatbots that rely solely on a Large Language Model, this application retrieves relevant information from user-uploaded documents before generating responses. The retrieval pipeline combines dense vector search, BM25 keyword search, Reciprocal Rank Fusion (RRF), and CrossEncoder re-ranking to improve retrieval accuracy and produce grounded answers.
+
+The project is designed with a modular architecture using FastAPI for the backend, Streamlit for the frontend, and Qdrant as the vector database, making it suitable as a learning project for production-inspired RAG systems.
 
 ---
 
-# 📸 Application Preview
+## ✨ Features
 
-The following screenshots demonstrate the current capabilities of the application.
+### 📄 Document Management
 
-> **Replace the placeholders below with actual screenshots after capturing your application.**
-
----
-
-## 🏠 Home Dashboard
-
-<p align="center">
-<img src=".github/assets/dashboard.png" width="90%">
-
-  <img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/07db20f1-cdf1-4588-942c-61b7b97a5e19" />
-
-</p>
-
-The dashboard provides an overview of the knowledge base, including indexed documents, vector storage statistics, and quick access to the application's core features.
-
----
-
-## 📚 Knowledge Base
-
-<p align="center">
-<img src=".github/assets/knowledge-base<img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/3f7a8402-69ab-4704-a18d-c95689760b7d" />
-<img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/5353744c-ca39-40f1-a5b0-5fe389915f91" />
-.png" width="90%">
-</p>
-
-The Knowledge Base allows users to:
-
-- Upload PDF documents
-- Search indexed documents
-- Select documents for retrieval
-- Delete documents
-- Refresh the document list
-
----
-
-## 💬 Chat Interface
-
-<p align="center">
-<img src=".github/assets/chat.png" width="90%">
-</p>
-
-The chat interface enables users to ask questions in natural language. The application retrieves relevant document chunks from the selected documents and generates grounded responses using Google Gemini.
-
----
-
-# ✨ Features
-
-The current implementation (Version 1) includes the following capabilities.
-
----
-
-## 📄 Document Management
-
-- Upload one or multiple PDF documents
-- Automatic PDF parsing
-- Semantic chunk generation
-- SHA-256 based duplicate document detection
+- Upload and index PDF documents
+- Automatic text extraction
+- Document search
+- Download uploaded documents
 - Delete indexed documents
-- Search documents by filename
-- Refresh the Knowledge Base
-- Metadata storage for each indexed document
 
----
+### 🔍 Retrieval
 
-## 🧠 Intelligent Retrieval
+- Semantic Vector Search
+- BM25 Keyword Search
+- Hybrid Search
+- Reciprocal Rank Fusion (RRF)
+- CrossEncoder Re-ranking
 
-- Semantic search using dense vector embeddings
-- Metadata-based document filtering
-- Multi-document retrieval
-- Configurable Top-K retrieval
-- Context construction for LLM prompting
-- Source-aware retrieval pipeline
+### 🤖 Question Answering
 
----
+- Context-aware responses
+- Groq (Llama 3.3 70B)
+- Source-grounded answers
 
-## 🤖 AI-Powered Question Answering
+### 📊 User Interface
 
-- Natural language querying
-- Context-aware answer generation
-- Google Gemini integration
-- Source citations included with responses
-- Retrieval-Augmented Generation (RAG) pipeline
-
----
-
-## 📊 Knowledge Base Management
-
-- View uploaded documents
-- Track indexed content
-- Organize document collection
-- Select specific documents for querying
-- Remove obsolete documents
-
----
-
-## ⚙️ Backend
-
-Built using **FastAPI**, providing:
-
-- RESTful API architecture
-- Modular service layer
-- Schema validation using Pydantic
-- Centralized configuration
-- Error handling
-- Logging support
-- Scalable project organization
-
----
-
-## 🎨 Frontend
-
-Built using **Streamlit**, featuring:
-
-- Clean and interactive interface
-- Modular UI components
-- Sidebar-based navigation
-- PDF upload workflow
-- Knowledge Base management
-- Real-time chat experience
-
----
-
-## 🔒 Data Integrity
-
-To improve reliability and maintain data consistency, the application includes:
-
-- SHA-256 hashing to prevent duplicate uploads
-- Metadata-based document tracking
-- Vector persistence using Qdrant
-- Consistent document indexing workflow
-
----
-
-# 📌 Current Version
-
-This repository currently represents **Version 1** of the Enterprise Knowledge Assistant.
-
-### ✅ Implemented
-
-- PDF Upload
-- PDF Parsing
-- Semantic Chunking
-- Dense Vector Embeddings
-- Qdrant Integration
-- Semantic Retrieval
-- Google Gemini Integration
-- Source Citations
-- Metadata Filtering
-- Duplicate Detection
+- Interactive Streamlit Dashboard
 - Knowledge Base Management
-- Document Search
-- Document Deletion
-- FastAPI REST API
-- Streamlit Frontend
-- Modular Project Architecture
-
-> **Version 2 features such as enhanced chat management, UI improvements, and dashboard enhancements are currently under development and are intentionally not listed as completed features.**
+- Persistent Chat History
+- Search Mode Selection
 
 ---
 
-# 🏗️ System Architecture
+## 🏗 Architecture
 
-The Enterprise Knowledge Assistant follows a modular Retrieval-Augmented Generation (RAG) architecture, separating document ingestion, retrieval, and response generation into independent components.
-
-```text
-                           ┌───────────────────────┐
-                           │        User           │
-                           └───────────┬───────────┘
-                                       │
-                                       ▼
-                           ┌───────────────────────┐
-                           │   Streamlit Frontend  │
-                           └───────────┬───────────┘
-                                       │
-                               REST API Calls
-                                       │
-                                       ▼
-                           ┌───────────────────────┐
-                           │    FastAPI Backend    │
-                           └───────┬───────┬───────┘
-                                   │       │
-                  Document Upload   │       │ User Query
-                                   │       │
-                                   ▼       ▼
-                      ┌───────────────────────┐
-                      │    PDF Loader         │
-                      └───────────┬───────────┘
-                                  │
-                                  ▼
-                      ┌───────────────────────┐
-                      │ Semantic Chunking     │
-                      └───────────┬───────────┘
-                                  │
-                                  ▼
-                      ┌───────────────────────┐
-                      │ Embedding Generation  │
-                      │ (Sentence Transformer)│
-                      └───────────┬───────────┘
-                                  │
-                                  ▼
-                      ┌───────────────────────┐
-                      │   Qdrant Vector DB    │
-                      └───────────┬───────────┘
-                                  │
-                          Semantic Retrieval
-                                  │
-                                  ▼
-                      ┌───────────────────────┐
-                      │  Prompt Construction  │
-                      └───────────┬───────────┘
-                                  │
-                                  ▼
-                      ┌───────────────────────┐
-                      │   Google Gemini LLM   │
-                      └───────────┬───────────┘
-                                  │
-                                  ▼
-                           Grounded Response
-                                  │
-                                  ▼
-                                User
-```
+![Architecture](assets/architecture.png)
 
 ---
 
-# 🔄 Retrieval-Augmented Generation (RAG) Workflow
+## 📸 Application Screenshots
 
-The application follows two independent workflows: **Document Ingestion** and **Question Answering**.
+### Dashboard
 
-## 📄 Document Ingestion Pipeline
-
-Whenever a user uploads a PDF, the following operations are performed:
-
-```text
-Upload PDF
-      │
-      ▼
-Load PDF
-      │
-      ▼
-Extract Text
-      │
-      ▼
-Semantic Chunking
-      │
-      ▼
-Generate Dense Embeddings
-      │
-      ▼
-Store Vectors in Qdrant
-      │
-      ▼
-Store Metadata
-```
-
-During indexing, metadata such as the filename, page number, chunk text, and SHA-256 document hash are stored alongside each vector. This enables duplicate detection and metadata-based retrieval.
+![Dashboard](assets/dashboard.png)
 
 ---
 
-## 💬 Question Answering Pipeline
+### Chat Interface
 
-When a user submits a question, the application performs the following steps:
-
-```text
-User Question
-      │
-      ▼
-Generate Query Embedding
-      │
-      ▼
-Search Qdrant
-      │
-      ▼
-Retrieve Top-K Chunks
-      │
-      ▼
-Apply Metadata Filtering
-      │
-      ▼
-Construct Prompt
-      │
-      ▼
-Generate Response with Gemini
-      │
-      ▼
-Return Answer + Source Citations
-```
-
-This Retrieval-Augmented Generation workflow ensures that responses are grounded in the uploaded documents rather than relying solely on the language model's pre-trained knowledge.
+![Chat](assets/chat.png)
 
 ---
 
-# 🛠️ Technology Stack
+### Document Upload
 
-The project combines modern AI frameworks with scalable backend technologies.
+![Upload](assets/upload.png)
+
+---
+
+### Chat Response
+
+![Response](assets/response.png)
+
+---
+
+## 🛠 Tech Stack
 
 | Category | Technology |
 |-----------|------------|
-| **Programming Language** | Python 3.13 |
-| **Backend Framework** | FastAPI |
-| **Frontend Framework** | Streamlit |
-| **Large Language Model** | Google Gemini |
-| **Embedding Model** | BAAI/bge-small-en-v1.5 |
-| **Vector Database** | Qdrant |
-| **Document Loader** | PyPDF |
-| **Data Validation** | Pydantic |
-| **HTTP Client** | Requests |
-| **Environment Management** | python-dotenv |
-| **Containerization** | Docker |
-| **Development Environment** | VS Code |
+| Backend | FastAPI |
+| Frontend | Streamlit |
+| Vector Database | Qdrant |
+| LLM | Groq (Llama 3.3 70B) |
+| Embeddings | Sentence Transformers |
+| Retrieval | Semantic Search, BM25, Hybrid Search, RRF, CrossEncoder |
+| Language | Python 3.13 |
 
 ---
 
-# 🏛️ Design Decisions
+## 📂 Project Structure
 
-Several architectural decisions were made to improve maintainability, scalability, and retrieval quality.
+```text
+enterprise-rag-assistant/
+│
+├── app/
+│   ├── api/
+│   ├── chunking/
+│   ├── config/
+│   ├── embeddings/
+│   ├── evaluation/
+│   ├── llm/
+│   ├── loaders/
+│   ├── prompts/
+│   ├── retrieval/
+│   ├── schemas/
+│   ├── services/
+│   ├── utils/
+│   └── vectorstore/
+│
+├── frontend/
+│   ├── components/
+│   ├── state/
+│   ├── storage/
+│   ├── backend_client.py
+│   └── ui.py
+│
+├── assets/
+├── data/
+├── main.py
+├── requirements.txt
+└── README.md
+```
+---
 
-### Why FastAPI?
+## ⚙ Installation
 
-- High-performance asynchronous backend
-- Automatic OpenAPI documentation
-- Clean API routing
-- Modular service architecture
+### Clone the repository
+
+```bash
+git clone https://github.com/boddetijayanth22/Enterprise-Knowledge-Assistant.git
+
+cd Enterprise-Knowledge-Assistant
+```
+
+### Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+### Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Configure environment variables
+
+```bash
+cp .env.example .env
+```
+
+Update the `.env` file with your own credentials.
+
+### Start the backend
+
+```bash
+uvicorn main:app --reload
+```
+
+### Launch the frontend
+
+```bash
+streamlit run frontend/ui.py
+```
 
 ---
 
-### Why Streamlit?
+## 🚀 Usage
 
-- Rapid UI development
-- Interactive interface
-- Simple integration with FastAPI
-- Ideal for AI application prototyping
-
----
-
-### Why Qdrant?
-
-- High-performance vector similarity search
-- Metadata filtering support
-- Efficient vector storage
-- Scalable retrieval architecture
+1. Start the FastAPI backend.
+2. Launch the Streamlit application.
+3. Upload one or more PDF documents.
+4. Wait for indexing to complete.
+5. Ask questions using Semantic, BM25, or Hybrid Search.
 
 ---
 
-### Why Sentence Transformers?
+## 🗺 Roadmap
 
-The project uses **BAAI/bge-small-en-v1.5**, providing:
+### ✅ Completed
 
-- High-quality semantic embeddings
-- Fast inference
-- Strong retrieval performance
-- Compact model size
+- PDF Upload & Parsing
+- Qdrant Integration
+- Semantic Search
+- BM25 Search
+- Hybrid Search
+- Reciprocal Rank Fusion (RRF)
+- CrossEncoder Re-ranking
+- Streamlit Dashboard
+- Persistent Chat History
+
+### 🔜 Planned
+
+- Docker Support
+- Authentication
+- Multi-user Workspace
+- Streaming Responses
+- LangGraph Integration
+- Agentic RAG
+- Multi-modal Documents
 
 ---
 
-### Why Google Gemini?
+## 🤝 Contributing
 
-Google Gemini was selected because it provides:
+Contributions, suggestions, and improvements are welcome. Feel free to open an issue or submit a pull request.
 
-- Strong reasoning capabilities
-- Natural language generation
-- Long-context support
-- Effective response generation for Retrieval-Augmented Generation pipelines
+---
+
+## 📜 License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## 👨‍💻 Author
+
+**B. Jayanth**
+
+If you found this project useful, consider giving it a ⭐ on GitHub.
 
 ---
