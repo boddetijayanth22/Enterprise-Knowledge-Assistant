@@ -20,8 +20,8 @@ Build intelligent document assistants powered by **Semantic Search**, **Vector E
 ---
 
 <p align="center">
+![Uploading gitbanner.png…]()
 
-<img src="C:\Users\bodde\OneDrive\Desktop\gitbanner.png" width="100%">
 
 </p>
 
