@@ -21,7 +21,7 @@ Build intelligent document assistants powered by **Semantic Search**, **Vector E
 
 <p align="center">
 
-<img src=".github/assets/banner.png" width="100%">
+<img src="C:\Users\bodde\OneDrive\Desktop\gitbanner.png" width="100%">
 
 </p>
 
