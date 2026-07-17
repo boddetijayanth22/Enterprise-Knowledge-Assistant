@@ -2,6 +2,7 @@ from langchain_core.documents import Document
 from app.config.settings import settings
 from app.embeddings.embedding_model import get_embedding_model
 from app.vectorstore.client import get_qdrant_client
+from app.utils.logger import logger
 from qdrant_client.models import (
     Filter,
     FieldCondition,
@@ -9,7 +10,7 @@ from qdrant_client.models import (
 )
 
 
-def retrieve(
+def semantic_retrieve(
     query: str,
     documents: list[str] | None = None,
     top_k: int = 5,
@@ -39,8 +40,8 @@ def retrieve(
 
     client = get_qdrant_client()
 
-    print("Selected documents:", documents)
-    print("Filter:", search_filter)
+    logger.info(f"Selected documents: {documents}")
+    logger.info(f"Filter: {search_filter}")
     
     results = client.query_points(
         collection_name=settings.collection_name,
@@ -49,10 +50,10 @@ def retrieve(
         limit=top_k,
     ).points
 
-    print("Results:",len(results))
+    logger.info(f"Retrieved {len(results)} chunks")
 
     for result in results:
-        print("Matched:", result.payload["source"])
+        logger.info(f"Matched: {result.payload['source']}")
 
     retrieved_documents = []
 
@@ -72,3 +73,24 @@ def retrieve(
         )
 
     return retrieved_documents
+
+SEARCH_MODE = "semantic"
+    
+def retrieve(
+    query: str,
+    documents: list[str] | None = None,
+    top_k: int = 5,
+):
+    if SEARCH_MODE == "semantic":
+
+        return semantic_retrieve(
+            query,
+            documents,
+            top_k,
+        )
+
+    elif SEARCH_MODE == "bm25":
+
+        raise NotImplementedError(
+            "BM25 retrieval not implemented."
+        )
