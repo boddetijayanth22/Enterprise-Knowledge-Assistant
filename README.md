@@ -101,6 +101,9 @@ The following screenshots demonstrate the current capabilities of the applicatio
 
 <p align="center">
 <img src=".github/assets/dashboard.png" width="90%">
+
+  <img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/07db20f1-cdf1-4588-942c-61b7b97a5e19" />
+
 </p>
 
 The dashboard provides an overview of the knowledge base, including indexed documents, vector storage statistics, and quick access to the application's core features.
@@ -110,7 +113,9 @@ The dashboard provides an overview of the knowledge base, including indexed docu
 ## 📚 Knowledge Base
 
 <p align="center">
-<img src=".github/assets/knowledge-base.png" width="90%">
+<img src=".github/assets/knowledge-base<img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/3f7a8402-69ab-4704-a18d-c95689760b7d" />
+<img width="1920" height="1080" alt="Screenshot 2026-07-17 121418" src="https://github.com/user-attachments/assets/5353744c-ca39-40f1-a5b0-5fe389915f91" />
+.png" width="90%">
 </p>
 
 The Knowledge Base allows users to:
