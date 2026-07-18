@@ -1,4 +1,4 @@
-import retrieve
+import re
 
 def tokenize(text: str) -> list[str]:
     """
