@@ -4,6 +4,7 @@ from app.embeddings.embedding_model import get_embedding_model
 from app.vectorstore.client import get_qdrant_client
 from app.utils.logger import logger
 from app.retrieval.bm25 import BM25Retriever
+from app.retrieval.hybrid import reciprocal_rank_fusion
 from qdrant_client.models import (
     Filter,
     FieldCondition,
@@ -146,7 +147,7 @@ def bm25_retrieve(
     )
 
 
-SEARCH_MODE = "bm25"
+SEARCH_MODE = "hybrid"
     
 def retrieve(
     query: str,
@@ -168,3 +169,32 @@ def retrieve(
             documents,
             top_k,
         )
+
+    elif SEARCH_MODE == "hybrid":
+        return hybrid_retrieve(
+            query,
+            documents,
+            top_k,
+        )
+
+def hybrid_retrieve(
+    query: str,
+    documents: list[str] | None = None,
+    top_k: int = 5,
+):
+    semantic_results = semantic_retrieve(
+        query,
+        documents,
+        top_k,
+    )
+
+    bm25_results = bm25_retrieve(
+        query,
+        documents,
+        top_k,
+    )
+
+    return reciprocal_rank_fusion(
+        semantic_results,
+        bm25_results,
+    )[:top_k]
