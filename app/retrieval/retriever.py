@@ -5,11 +5,18 @@ from app.vectorstore.client import get_qdrant_client
 from app.utils.logger import logger
 from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid import reciprocal_rank_fusion
+from app.retrieval.reranker import CrossEncoderReranker
 from qdrant_client.models import (
     Filter,
     FieldCondition,
     MatchValue,
 )
+
+SEARCH_MODE = settings.search_mode
+
+BM25_RETRIEVER = None
+
+RERANKER = CrossEncoderReranker()
 
 
 def load_documents(
@@ -134,27 +141,32 @@ def bm25_retrieve(
     """
     Retrieve document chunks using BM25.
     """
+    global BM25_RETRIEVER
 
-    loaded_documents = load_documents(documents)
+    if BM25_RETRIEVER is None:
+        loaded_documents = load_documents(documents)
 
-    retriever = BM25Retriever()
+        BM25_RETRIEVER = BM25Retriever()
 
-    retriever.build_index(loaded_documents)
+        BM25_RETRIEVER.build_index(loaded_documents)
 
-    return retriever.retrieve(
+    return BM25_RETRIEVER.retrieve(
         query=query,
         top_k=top_k,
     )
 
 
-SEARCH_MODE = "hybrid"
+SEARCH_MODE = settings.search_mode
     
 def retrieve(
     query: str,
     documents: list[str] | None = None,
     top_k: int = 5,
+    mode: str | None = None,
 ):
-    if SEARCH_MODE == "semantic":
+
+    mode = mode or SEARCH_MODE
+    if mode == "semantic":
 
         return semantic_retrieve(
             query,
@@ -162,7 +174,7 @@ def retrieve(
             top_k,
         )
 
-    elif SEARCH_MODE == "bm25":
+    elif mode == "bm25":
 
         return bm25_retrieve(
             query,
@@ -170,8 +182,16 @@ def retrieve(
             top_k,
         )
 
-    elif SEARCH_MODE == "hybrid":
+    elif mode == "hybrid":
         return hybrid_retrieve(
+            query,
+            documents,
+            top_k,
+        )
+
+    elif mode == "hybrid_reranker":
+
+        return hybrid_reranker_retrieve(
             query,
             documents,
             top_k,
@@ -198,3 +218,26 @@ def hybrid_retrieve(
         semantic_results,
         bm25_results,
     )[:top_k]
+
+RERANKER = CrossEncoderReranker()
+
+def hybrid_reranker_retrieve(
+    query: str,
+    documents: list[str] | None = None,
+    top_k: int = 5,
+):
+    """
+    Hybrid Search followed by CrossEncoder re-ranking.
+    """
+
+    hybrid_results = hybrid_retrieve(
+        query=query,
+        documents=documents,
+        top_k=20,
+    )
+
+    return RERANKER.rerank(
+        query=query,
+        documents=hybrid_results,
+        top_k=top_k,
+    )

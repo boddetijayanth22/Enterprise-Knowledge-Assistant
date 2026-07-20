@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     groq_api_key: str
 
+    search_mode: str = "semantic"
+    
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(

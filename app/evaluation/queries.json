@@ -1,0 +1,75 @@
+[
+  {
+    "query": "What is linear algebra?",
+    "expected_sources": [
+      "LinearAlgebra.pdf"
+    ]
+  },
+  {
+    "query": "Explain the vectors in linear algebra.",
+    "expected_sources": [
+      "LinearAlgebra.pdf"
+    ]
+  },
+  {
+    "query": "What is Retrieval-Augmented Generation (RAG)?",
+    "expected_sources": [
+      "Sample.pdf"
+    ]
+  },
+  {
+    "query": "How do Large Language Models differ from traditional machine learning models?",
+    "expected_sources": [
+      "Sample.pdf"
+    ]
+  },
+  {
+    "query": "What are multimodal language models?",
+    "expected_sources": [
+      "Sample.pdf"
+    ]
+  },
+  {
+    "query": "Explain Python list comprehensions with examples.",
+    "expected_sources": [
+      "Sample.pdf"
+    ]
+  },
+  {
+    "query": "What is prompt engineering?",
+    "expected_sources": [
+      "Prompt_Engineering_Master_Handbook_v3.pdf"
+    ]
+  },
+  {
+    "query": "Explain the difference between zero-shot and few-shot prompting.",
+    "expected_sources": [
+      "Prompt_Engineering_Master_Handbook_v3.pdf"
+    ]
+  },
+  {
+    "query": "What are the best practices for writing effective prompts?",
+    "expected_sources": [
+      "Prompt_Engineering_Master_Handbook_v3.pdf"
+    ]
+  },
+  {
+    "query": "What is the central theme of U n Me It's Complicated?",
+    "expected_sources": [
+      "U n Me Its Complicated.pdf"
+    ]
+  },
+  {
+    "query": "which chapter does the book teach about relationships?",
+    "expected_sources": [
+      "U n Me Its Complicated.pdf"
+    ]
+  },
+  {
+    "query": "How can prompt engineering improve the performance of LLMs?",
+    "expected_sources": [
+      "Prompt_Engineering_Master_Handbook_v3.pdf",
+      "Sample.pdf"
+    ]
+  }
+]

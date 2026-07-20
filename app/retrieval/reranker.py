@@ -1,14 +1,19 @@
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
 
+print("Loading CrossEncoder model...")
+
+MODEL = CrossEncoder(
+    "cross-encoder/ms-marco-MiniLM-L-6-v2"
+)
+
+print("CrossEncoder loaded.")
+
 
 class CrossEncoderReranker:
 
     def __init__(self):
-
-        self.model = CrossEncoder(
-            "cross-encoder/ms-marco-MiniLM-L-6-v2"
-        )
+        self.model = MODEL
 
     def rerank(
         self,
@@ -17,12 +22,23 @@ class CrossEncoderReranker:
         top_k: int = 5,
     ) -> list[Document]:
 
-        hybrid_results = ...
+        sentence_pairs = [
+            (query, document.page_content)
+            for document in documents
+        ]
 
-        reranker = CrossEncoderReranker()
+        scores = self.model.predict(sentence_pairs)
 
-        return reranker.rerank(
-            query=query,
-            documents=hybrid_results,
-            top_k=top_k,
+        ranked_documents = sorted(
+            zip(documents, scores),
+            key=lambda item: item[1],
+            reverse=True,
         )
+
+        reranked_documents = []
+
+        for document, score in ranked_documents[:top_k]:
+            document.metadata["reranker_score"] = float(score)
+            reranked_documents.append(document)
+
+        return reranked_documents

@@ -1,0 +1,162 @@
+{
+    "retriever": "hybrid",
+    "top_k": 5,
+    "queries": 12,
+    "average_precision@5": 0.778,
+    "average_recall@5": 1.0,
+    "average_mrr@5": 1.0,
+    "results": [
+        {
+            "query": "What is linear algebra?",
+            "expected_sources": [
+                "linearalgebra.pdf"
+            ],
+            "retrieved_sources": [
+                "linearalgebra.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "Explain the vectors in linear algebra.",
+            "expected_sources": [
+                "linearalgebra.pdf"
+            ],
+            "retrieved_sources": [
+                "linearalgebra.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "What is Retrieval-Augmented Generation (RAG)?",
+            "expected_sources": [
+                "sample.pdf"
+            ],
+            "retrieved_sources": [
+                "sample.pdf",
+                "prompt_engineering_master_handbook_v3.pdf"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "How do Large Language Models differ from traditional machine learning models?",
+            "expected_sources": [
+                "sample.pdf"
+            ],
+            "retrieved_sources": [
+                "sample.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "What are multimodal language models?",
+            "expected_sources": [
+                "sample.pdf"
+            ],
+            "retrieved_sources": [
+                "sample.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "Explain Python list comprehensions with examples.",
+            "expected_sources": [
+                "sample.pdf"
+            ],
+            "retrieved_sources": [
+                "sample.pdf",
+                "prompt_engineering_master_handbook_v3.pdf"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "What is prompt engineering?",
+            "expected_sources": [
+                "prompt_engineering_master_handbook_v3.pdf"
+            ],
+            "retrieved_sources": [
+                "prompt_engineering_master_handbook_v3.pdf",
+                "sample.pdf"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "Explain the difference between zero-shot and few-shot prompting.",
+            "expected_sources": [
+                "prompt_engineering_master_handbook_v3.pdf"
+            ],
+            "retrieved_sources": [
+                "prompt_engineering_master_handbook_v3.pdf",
+                "linearalgebra.pdf",
+                "sample.pdf"
+            ],
+            "precision": 0.333,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "What are the best practices for writing effective prompts?",
+            "expected_sources": [
+                "prompt_engineering_master_handbook_v3.pdf"
+            ],
+            "retrieved_sources": [
+                "prompt_engineering_master_handbook_v3.pdf",
+                "u n me its complicated.pdf"
+            ],
+            "precision": 0.5,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "What is the central theme of U n Me It's Complicated?",
+            "expected_sources": [
+                "u n me its complicated.pdf"
+            ],
+            "retrieved_sources": [
+                "u n me its complicated.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "which chapter does the book teach about relationships?",
+            "expected_sources": [
+                "u n me its complicated.pdf"
+            ],
+            "retrieved_sources": [
+                "u n me its complicated.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        },
+        {
+            "query": "How can prompt engineering improve the performance of LLMs?",
+            "expected_sources": [
+                "prompt_engineering_master_handbook_v3.pdf",
+                "sample.pdf"
+            ],
+            "retrieved_sources": [
+                "prompt_engineering_master_handbook_v3.pdf",
+                "sample.pdf"
+            ],
+            "precision": 1.0,
+            "recall": 1.0,
+            "mrr": 1.0
+        }
+    ]
+}
