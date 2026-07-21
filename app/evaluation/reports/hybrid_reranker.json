@@ -2,7 +2,7 @@
     "retriever": "hybrid_reranker",
     "top_k": 5,
     "queries": 12,
-    "average_precision@5": 0.722,
+    "average_precision@5": 0.368,
     "average_recall@5": 1.0,
     "average_mrr@5": 1.0,
     "results": [
@@ -12,9 +12,10 @@
                 "linearalgebra.pdf"
             ],
             "retrieved_sources": [
-                "linearalgebra.pdf"
+                "linearalgebra.pdf",
+                "sample.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.5,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -24,9 +25,11 @@
                 "linearalgebra.pdf"
             ],
             "retrieved_sources": [
-                "linearalgebra.pdf"
+                "linearalgebra.pdf",
+                "sample.pdf",
+                "u n me its complicated.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.333,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -37,9 +40,11 @@
             ],
             "retrieved_sources": [
                 "sample.pdf",
-                "prompt_engineering_master_handbook_v3.pdf"
+                "prompt_engineering_master_handbook_v3.pdf",
+                "linearalgebra.pdf",
+                "u n me its complicated.pdf"
             ],
-            "precision": 0.5,
+            "precision": 0.25,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -62,9 +67,12 @@
                 "sample.pdf"
             ],
             "retrieved_sources": [
-                "sample.pdf"
+                "sample.pdf",
+                "linearalgebra.pdf",
+                "u n me its complicated.pdf",
+                "prompt_engineering_master_handbook_v3.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.25,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -75,9 +83,11 @@
             ],
             "retrieved_sources": [
                 "sample.pdf",
-                "linearalgebra.pdf"
+                "linearalgebra.pdf",
+                "prompt_engineering_master_handbook_v3.pdf",
+                "u n me its complicated.pdf"
             ],
-            "precision": 0.5,
+            "precision": 0.25,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -88,9 +98,11 @@
             ],
             "retrieved_sources": [
                 "prompt_engineering_master_handbook_v3.pdf",
-                "sample.pdf"
+                "sample.pdf",
+                "linearalgebra.pdf",
+                "u n me its complicated.pdf"
             ],
-            "precision": 0.5,
+            "precision": 0.25,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -102,9 +114,10 @@
             "retrieved_sources": [
                 "prompt_engineering_master_handbook_v3.pdf",
                 "u n me its complicated.pdf",
-                "sample.pdf"
+                "sample.pdf",
+                "linearalgebra.pdf"
             ],
-            "precision": 0.333,
+            "precision": 0.25,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -128,9 +141,10 @@
                 "u n me its complicated.pdf"
             ],
             "retrieved_sources": [
-                "u n me its complicated.pdf"
+                "u n me its complicated.pdf",
+                "linearalgebra.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.5,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -140,9 +154,10 @@
                 "u n me its complicated.pdf"
             ],
             "retrieved_sources": [
-                "u n me its complicated.pdf"
+                "u n me its complicated.pdf",
+                "linearalgebra.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.5,
             "recall": 1.0,
             "mrr": 1.0
         },
@@ -154,9 +169,11 @@
             ],
             "retrieved_sources": [
                 "prompt_engineering_master_handbook_v3.pdf",
-                "sample.pdf"
+                "sample.pdf",
+                "u n me its complicated.pdf",
+                "linearalgebra.pdf"
             ],
-            "precision": 1.0,
+            "precision": 0.5,
             "recall": 1.0,
             "mrr": 1.0
         }

@@ -6,6 +6,7 @@ from app.utils.logger import logger
 from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid import reciprocal_rank_fusion
 from app.retrieval.reranker import CrossEncoderReranker
+from app.retrieval.semantic import semantic_retrieve
 from qdrant_client.models import (
     Filter,
     FieldCondition,
@@ -14,10 +15,11 @@ from qdrant_client.models import (
 
 SEARCH_MODE = settings.search_mode
 
-BM25_RETRIEVER = None
+BM25_CACHE: dict[tuple[str, ...], BM25Retriever] = {}
 
 RERANKER = CrossEncoderReranker()
 
+RERANK_CANDIDATES = 20
 
 def load_documents(
     documents: list[str] | None = None,
@@ -67,96 +69,49 @@ def load_documents(
 
     return loaded_documents
 
-
-def semantic_retrieve(
-    query: str,
-    documents: list[str] | None = None,
-    top_k: int = 5,
-):
-    """
-    Retrieve the most relevent document chunks
-    using semantic vector search.
-    """
-
-    search_filter = None
-
-    if documents:
-
-        search_filter = Filter(
-            should=[
-                FieldCondition(
-                    key="source",
-                    match=MatchValue(value=document),
-                )
-                for document in documents
-            ]
-        )
-
-    embedding_model = get_embedding_model()
-
-    query_vector = embedding_model.embed_query(query)
-
-    client = get_qdrant_client()
-
-    logger.info(f"Selected documents: {documents}")
-    logger.info(f"Filter: {search_filter}")
-    
-    results = client.query_points(
-        collection_name=settings.collection_name,
-        query=query_vector,
-        query_filter=search_filter,
-        limit=top_k,
-    ).points
-
-    logger.info(f"Retrieved {len(results)} chunks")
-
-    for result in results:
-        logger.info(f"Matched: {result.payload['source']}")
-
-    retrieved_documents = []
-
-    for result in results:
-
-        payload = result.payload
-
-        retrieved_documents.append(
-            Document(
-                page_content=payload["text"],
-                metadata={
-                    "page": payload["page"],
-                    "source": payload["source"],
-                    "score": result.score,
-                },
-            )
-        )
-
-    return retrieved_documents
-
-
 def bm25_retrieve(
     query: str,
     documents: list[str] | None = None,
     top_k: int = 5,
 ):
     """
-    Retrieve document chunks using BM25.
-    """
-    global BM25_RETRIEVER
+    Retrieve relevant document chunks using BM25.
 
-    if BM25_RETRIEVER is None:
+    A separate BM25 index is cached for each unique document
+    selection to avoid rebuilding the index on every request.
+    """
+
+    global BM25_CACHE
+
+    cache_key = (
+        tuple(sorted(set(documents)))
+        if documents
+        else ("__ALL__",)
+    )
+
+    if cache_key not in BM25_CACHE:
+
         loaded_documents = load_documents(documents)
 
-        BM25_RETRIEVER = BM25Retriever()
+        retriever = BM25Retriever()
+        retriever.build_index(loaded_documents)
 
-        BM25_RETRIEVER.build_index(loaded_documents)
+        BM25_CACHE[cache_key] = retriever
 
-    return BM25_RETRIEVER.retrieve(
+        logger.info(
+            f"Created BM25 index for cache key: {cache_key}"
+        )
+
+    else:
+
+        logger.info(
+            f"Using cached BM25 index for cache key: {cache_key}"
+        )
+
+    return BM25_CACHE[cache_key].retrieve(
         query=query,
         top_k=top_k,
     )
-
-
-SEARCH_MODE = settings.search_mode
     
 def retrieve(
     query: str,
@@ -166,9 +121,9 @@ def retrieve(
 ):
 
     mode = mode or SEARCH_MODE
-    if mode == "semantic":
+    if mode == "hybrid_reranker":
 
-        return semantic_retrieve(
+        return hybrid_reranker_retrieve(
             query,
             documents,
             top_k,
@@ -182,19 +137,23 @@ def retrieve(
             top_k,
         )
 
+    elif mode == "semantic":
+        return semantic_retrieve(
+            query,
+            documents,
+            top_k,
+        )
+
     elif mode == "hybrid":
         return hybrid_retrieve(
             query,
             documents,
             top_k,
         )
-
-    elif mode == "hybrid_reranker":
-
-        return hybrid_reranker_retrieve(
-            query,
-            documents,
-            top_k,
+    
+    else:
+        raise ValueError(
+            f"Unknown retrieval mode: {mode}"
         )
 
 def hybrid_retrieve(
@@ -219,8 +178,6 @@ def hybrid_retrieve(
         bm25_results,
     )[:top_k]
 
-RERANKER = CrossEncoderReranker()
-
 def hybrid_reranker_retrieve(
     query: str,
     documents: list[str] | None = None,
@@ -233,11 +190,11 @@ def hybrid_reranker_retrieve(
     hybrid_results = hybrid_retrieve(
         query=query,
         documents=documents,
-        top_k=20,
+        top_k=RERANK_CANDIDATES,
     )
 
     return RERANKER.rerank(
         query=query,
         documents=hybrid_results,
-        top_k=top_k,
+        top_k=RERANK_CANDIDATES,
     )
