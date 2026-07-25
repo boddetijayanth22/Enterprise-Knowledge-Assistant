@@ -1,4 +1,4 @@
-from app.services.rag_service import ask
+from app.services.query_service import ask
 from app.services.ingestion_service import ingest_pdf
 
 

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from app.utils.logger import logger
 
 from app.evaluation.metrics import (
     precision_at_k,
@@ -187,8 +188,8 @@ def save_report(
             indent=4,
         )
 
-    print(f"\n Report saved: {report_file}\n")
-    print(json.dumps(report, indent=4))
+    logger.info(f"\n Report saved: {report_file}\n")
+    logger.info(json.dumps(report, indent=4))
 
 
 if __name__ == "__main__":

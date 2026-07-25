@@ -3,15 +3,12 @@ from app.prompts.rag_prompt import rag_prompt
 from app.retrieval.retriever import retrieve
 from pathlib import Path
 
-def ask(
-    question: str,
-    documents: list[str] | None = None,
-):
-
-
+def ask(question, documents, mode):
+    
     retrieved_docs = retrieve(
         question,
         documents,
+        mode = mode,
     )
 
     context = "\n\n".join(
@@ -33,6 +30,11 @@ def ask(
     sources = []
 
     seen = set()
+
+    print("=" * 80)
+    print("Retrieved Context")
+    print(context)
+    print("=" * 80)
 
     for doc in retrieved_docs:
         file = Path(doc.metadata["source"]).as_posix()

@@ -11,7 +11,7 @@ def render_sidebar():
     st.markdown("# Enterprise Knowledge Assistant")
 
     st.caption(
-        "Semantic Search powered by Gemini + Qdrant and FastAPI"
+        "Multi-Strategy Retrieval powered by Gemini + Qdrant and FastAPI"
     )
 
     st.divider()
@@ -22,9 +22,9 @@ def render_sidebar():
 
     selected_documents = render_knowledge_base()
 
-    render_dashboard()
-
     render_search_mode()
+
+    render_dashboard()
 
     if st.button(
         "🔄 Refresh Knowledge Base",

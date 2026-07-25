@@ -3,6 +3,7 @@ from app.config.settings import settings
 from app.embeddings.embedding_model import get_embedding_model
 from app.vectorstore.client import get_qdrant_client
 from app.utils.logger import logger
+
 from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid import reciprocal_rank_fusion
 from app.retrieval.reranker import CrossEncoderReranker
@@ -121,6 +122,7 @@ def retrieve(
 ):
 
     mode = mode or SEARCH_MODE
+
     if mode == "hybrid_reranker":
 
         return hybrid_reranker_retrieve(
@@ -193,8 +195,18 @@ def hybrid_reranker_retrieve(
         top_k=RERANK_CANDIDATES,
     )
 
+    print("\nHYBRID RESULTS")
+    for i, doc in enumerate(hybrid_results):
+        print(i + 1, doc.metadata, doc.page_content[:100])
+
     return RERANKER.rerank(
         query=query,
         documents=hybrid_results,
-        top_k=RERANK_CANDIDATES,
+        top_k=top_k,
     )
+
+    print("\nRERANKED RESULTS")
+    for i, doc in enumerate(reranked):
+        print(i + 1, doc.metadata, doc.page_content[:100])
+
+    return reranked

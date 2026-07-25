@@ -5,14 +5,46 @@
 __pycache__/
 *.py[cod]
 *.pyo
+*.log
 
 # Virtual environment
 .venv/
 venv/
 
+# IDE
+.vscode/
+.idea/
+
 # OS files
 .DS_Store
 Thumbs.db
+<<<<<<< HEAD
 
 # Json Files
 data/chats/
+=======
+desktop.ini
+
+# Test cache
+.pytest_cache/
+
+# Static analysis
+.mypy_cache/
+.ruff_cache/
+
+# Local data
+data/raw/*
+!data/raw/.gitkeep
+
+data/processed/*
+!data/processed/.gitkeep
+
+data/chats/*
+!data/chats/.gitkeep
+
+# Vector DB
+qdrant_storage/
+
+# Jupyter
+.ipynb_checkpoints/
+>>>>>>> 8e0c2c0 (Release Enterprise Knowledge Assistant v2)

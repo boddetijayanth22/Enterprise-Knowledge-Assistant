@@ -7,6 +7,110 @@ from state.session import (
     delete_chat,
 )
 
+from storage.chat_storage import (
+    list_chat_files,
+    rename_chat,
+    pin_chat,
+)
+
+@st.dialog("Rename Chat")
+def rename_chat_dialog(chat_id, current_title):
+
+    new_title = st.text_input(
+        "Chat Title",
+        value=current_title,
+    )
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+
+        if st.button("Save", use_container_width=True):
+
+            rename_chat(chat_id, new_title)
+
+            st.rerun()
+
+    with col2:
+
+        if st.button("Cancel", use_container_width=True):
+
+            st.rerun()
+
+def render_chat_item(chat):
+
+    chat_id = chat["id"]
+
+    title = chat["title"]
+
+    col_pin, col_title, col_menu = st.columns([0.6, 7.4, 1])
+
+    with col_pin:
+
+        if chat.get("pinned", False):
+            st.markdown("  📌")
+
+        with col_title:
+
+            button_type = "secondary"
+
+            if chat_id == st.session_state.current_chat:
+                button_type = "primary"
+
+            if st.button(
+                title,
+                key=f"chat_{chat_id}",
+                use_container_width=True,                    type=button_type,
+            ):
+                st.session_state.rename_chat = None
+
+                switch_chat(chat_id)
+
+                st.rerun()
+
+        with col_menu:
+
+            with st.popover("☰"):
+
+                if st.button(
+                    "✏️ Rename",
+                    key=f"rename_{chat_id}",
+                    use_container_width=True,
+                ):
+
+                    rename_chat_dialog(
+                        chat_id,
+                        chat["title"],
+                    )
+
+                    st.session_state.rename_chat = chat_id
+
+                pin_label = (
+                "📍 Unpin Chat"
+                if chat.get("pinned", False)
+                    else "📌 Pin Chat"
+                )
+
+                if st.button(
+                    pin_label,
+                    key=f"pin_{chat_id}",
+                    use_container_width=True,
+                ):
+
+                    pin_chat(chat_id)
+                    
+                    st.rerun()
+
+                if st.button(
+                    "🗑 Delete",
+                    key=f"delete_chat_{chat_id}",
+                    use_container_width=True,
+                ):
+
+                    delete_chat(chat_id)
+
+                    st.rerun()
+
 
 def render_chat_sidebar():
 
@@ -18,41 +122,60 @@ def render_chat_sidebar():
         "Start a new conversation or continue an existing one."
     )
 
+    search_query = st.text_input(
+        "🔍 Search Chats",
+        placeholder="Type a chat title...",
+    )
+
     if st.button(
         "➕ New Chat",
         use_container_width=True,
     ):
+
+        st.session_state.rename_chat = None
+
         create_chat()
+
         st.rerun()
 
     st.divider()
 
-    for chat_id, chat in st.session_state.chats.items():
+    chats = list_chat_files()
 
-        col1, col2 = st.columns([5, 1])
+    filtered_chats = [
+        chat
+        for chat in chats
+        if search_query.lower() in chat["title"].lower()
+    ]
 
-        with col1:
+    if not filtered_chats:
 
-            title = chat["title"]
+        st.caption("No chats found.")
 
-            if chat_id == st.session_state.current_chat:
-                title = "🟢 " + title
+        return
 
-            if st.button(
-                title,
-                key=f"chat_{chat_id}",
-                use_container_width=True,
-            ):
-                switch_chat(chat_id)
-                st.rerun()
+    pinned_chats = [
+        chat for chat in filtered_chats
+        if chat.get("pinned", False)
+    ]
 
-        with col2:
+    other_chats = [
+        chat for chat in filtered_chats
+        if not chat.get("pinned", False)
+    ]
 
-            if st.button(
-                "🗑",
-                key=f"delete_chat_{chat_id}",
-            ):
-                delete_chat(chat_id)
-                st.rerun()
+    if pinned_chats:
 
-    st.divider()
+        st.caption("Pinned")
+
+        for chat in pinned_chats:
+
+            render_chat_item(chat)
+
+    if other_chats:
+
+        st.caption("")
+
+        for chat in other_chats:
+
+            render_chat_item(chat)

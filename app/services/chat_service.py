@@ -1,22 +1,23 @@
 from app.retrieval.retriever import retrieve
+from app.utils.logger import logger
 
 
 def chat(question: str):
 
     documents = retrieve(question)
 
-    print("\nTop Retrieved Chunks\n")
+    logger.info("\nTop Retrieved Chunks\n")
 
     for i, doc in enumerate(documents, start=1):
 
-        print("=" * 60)
+        logger.info("=" * 60)
 
-        print(f"Result {i}")
+        logger.info(f"Result {i}")
 
-        print(f"Score : {doc.metadata['score']:.4f}")
+        logger.info(f"Score : {doc.metadata['score']:.4f}")
 
-        print(f"Page  : {doc.metadata['page']}")
+        logger.info(f"Page  : {doc.metadata['page']}")
 
-        print(doc.page_content[:300])
+        logger.info(doc.page_content[:300])
 
-        print()
+        logger.info()

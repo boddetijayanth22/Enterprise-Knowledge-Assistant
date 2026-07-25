@@ -4,6 +4,7 @@ from qdrant_client.http.exceptions import UnexpectedResponse
 
 from app.config.settings import settings
 from app.vectorstore.client import get_qdrant_client
+from app.utils.logger import logger
 
 
 def get_dashboard_data():
@@ -47,8 +48,8 @@ def get_dashboard_data():
         "vector_db": "Qdrant",
     }
 
-    print("Documents returned:")
+    logger.info("Documents returned:")
     for doc in documents:
-        print(doc)
+        logger.info(doc)
 
     return documents, stats

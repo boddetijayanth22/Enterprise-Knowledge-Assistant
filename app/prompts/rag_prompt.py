@@ -4,11 +4,11 @@ rag_prompt = ChatPromptTemplate.from_template(
     """
 You are a helpful AI assistant.
 
-Answer ONLY from the provided context.
+Answer ONLY using the provided context.
 
-If the answer is not present, say:
+If the context contains related information that partially answers the question, provide the best possible answer from that information.
 
-"I couldn't find the answer in the provided documents."
+Only say "I couldn't find the answer in the provided documents." when the retrieved context is completely unrelated.
 
 Context:
 {context}

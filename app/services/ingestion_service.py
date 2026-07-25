@@ -68,7 +68,7 @@ def ingest_pdf(pdf_path: str) -> None:
 
     logger.info("Uploading vectors to Qdrant...")
 
-    print(points[0].payload)
+    logger.info(points[0].payload)
 
     client.upsert(
         collection_name=settings.collection_name,

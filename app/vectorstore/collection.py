@@ -1,5 +1,6 @@
 from app.vectorstore.client import get_qdrant_client
 from app.config.settings import settings
+from app.utils.logger import logger
 
 from qdrant_client.models import Distance, VectorParams
 
@@ -16,4 +17,4 @@ client.create_collection(
     ),
 )
 
-print("Collection created successfully.")
+logger.info("Collection created successfully.")

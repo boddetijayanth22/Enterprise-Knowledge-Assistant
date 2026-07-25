@@ -1,13 +1,14 @@
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
+from app.utils.logger import logger
 
-print("Loading CrossEncoder model...")
+logger.info("Loading CrossEncoder model...")
 
 MODEL = CrossEncoder(
     "cross-encoder/ms-marco-MiniLM-L-6-v2"
 )
 
-print("CrossEncoder loaded.")
+logger.info("Loading CrossEncoder loaded.")
 
 
 class CrossEncoderReranker:

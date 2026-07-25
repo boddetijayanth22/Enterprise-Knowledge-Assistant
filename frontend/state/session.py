@@ -1,47 +1,45 @@
 import streamlit as st
-import uuid
+
+from storage.chat_storage import (
+    create_chat_file,
+    save_chat_file,
+    load_chat_file,
+    list_chat_files,
+    delete_chat_file,
+)
 
 
 def initialize_session():
-    """
-    Initialize the application state.
-    """
 
-    if "chats" not in st.session_state:
+    if "selected_document" not in st.session_state:
+        st.session_state.selected_document = None
 
-        chat_id = str(uuid.uuid4())
+    if "rename_chat" not in st.session_state:
+        st.session_state.rename_chat = None
 
-        st.session_state.chats = {
-            chat_id: {
-                "title": "New Chat",
-                "messages": [],
-            }
-        }
+    if "current_chat" not in st.session_state:
 
-        st.session_state.current_chat = chat_id
+        chats = list_chat_files()
 
+        if chats:
+
+            st.session_state.current_chat = chats[0]["id"]
+
+        else:
+
+            create_chat()
 
 def create_chat():
-    """
-    Create a new chat session.
-    """
 
-    chat_id = str(uuid.uuid4())
+    chat = create_chat_file()
 
-    st.session_state.chats[chat_id] = {
-        "title": "New Chat",
-        "messages": [],
-    }
-
-    st.session_state.current_chat = chat_id
-
+    st.session_state.current_chat = chat["id"]
 
 def get_current_chat():
 
-    return st.session_state.chats[
+    return load_chat_file(
         st.session_state.current_chat
-    ]
-
+    )
 
 def switch_chat(chat_id):
 
@@ -49,11 +47,13 @@ def switch_chat(chat_id):
 
 def delete_chat(chat_id):
 
-    if len(st.session_state.chats) == 1:
+    chats = list_chat_files()
+
+    if len(chats) == 1:
         return
 
-    del st.session_state.chats[chat_id]
+    delete_chat_file(chat_id)
 
-    st.session_state.current_chat = next(
-        iter(st.session_state.chats)
-    )
+    chats = list_chat_files()
+
+    st.session_state.current_chat = chats[0]["id"]
