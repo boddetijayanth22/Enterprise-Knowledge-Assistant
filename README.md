@@ -6,6 +6,17 @@ A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application bu
 
 </p>
 
+---
+# Enterprise Knowledge Assistant
+
+<p align="center">
+  <img src="assets/banner.png" alt="Enterprise Knowledge Assistant Banner" width="100%">
+</p>
+
+A production-inspired Retrieval-Augmented Generation (RAG) application featuring Hybrid Search, Cross-Encoder Re-ranking, and a Retrieval Evaluation Framework.
+
+---
+
 <p align="center">
 
 ![Python](https://img.shields.io/badge/Python-3.13-blue?logo=python)
