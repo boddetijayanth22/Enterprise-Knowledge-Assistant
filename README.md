@@ -104,7 +104,7 @@ The project is designed with a modular architecture using FastAPI for the backen
 
 ### Document Upload
 
-![Upload](assets/upload.png)
+<img width="1920" height="1080" alt="Upload and Documents " src="https://github.com/user-attachments/assets/3505c959-0785-475e-85e2-ed2945709dbe" />
 
 ---
 
