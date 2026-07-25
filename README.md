@@ -1,7 +1,7 @@
-# Enterprise Knowledge Assistant
+# 🚀 Enterprise Knowledge Assistant
 
 <p align="center">
-  <img src="assets/banner.png" alt="Enterprise Knowledge Assistant Banner" width="100%">
+  <img src="assets/banner.png" alt="Enterprise Knowledge Assistant Banner" width="150%">
 </p>
 
 A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application built with <b>FastAPI</b>, <b>Streamlit</b>, <b>Qdrant</b>, <b>Hybrid Search</b>, <b>BM25</b>, and <b>CrossEncoder Re-ranking</b> for intelligent document question answering.
