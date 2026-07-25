@@ -1,19 +1,10 @@
-# 🚀 Enterprise Knowledge Assistant
-
-<p align="center">
-
-A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application built with <b>FastAPI</b>, <b>Streamlit</b>, <b>Qdrant</b>, <b>Hybrid Search</b>, <b>BM25</b>, and <b>CrossEncoder Re-ranking</b> for intelligent document question answering.
-
-</p>
-
----
 # Enterprise Knowledge Assistant
 
 <p align="center">
   <img src="assets/banner.png" alt="Enterprise Knowledge Assistant Banner" width="100%">
 </p>
 
-A production-inspired Retrieval-Augmented Generation (RAG) application featuring Hybrid Search, Cross-Encoder Re-ranking, and a Retrieval Evaluation Framework.
+A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application built with <b>FastAPI</b>, <b>Streamlit</b>, <b>Qdrant</b>, <b>Hybrid Search</b>, <b>BM25</b>, and <b>CrossEncoder Re-ranking</b> for intelligent document question answering.
 
 ---
 
