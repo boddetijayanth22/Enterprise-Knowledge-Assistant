@@ -1,10 +1,12 @@
 # 🚀 Enterprise Knowledge Assistant
 
 <p align="center">
+  <img src="assets/banner.png" alt="Enterprise Knowledge Assistant Banner" width="150%">
+</p>
 
 A <b>production-inspired Retrieval-Augmented Generation (RAG)</b> application built with <b>FastAPI</b>, <b>Streamlit</b>, <b>Qdrant</b>, <b>Hybrid Search</b>, <b>BM25</b>, and <b>CrossEncoder Re-ranking</b> for intelligent document question answering.
 
-</p>
+---
 
 <p align="center">
 
@@ -104,7 +106,7 @@ The project is designed with a modular architecture using FastAPI for the backen
 
 ### Document Upload
 
-![Upload](assets/upload.png)
+<img width="1920" height="1080" alt="Upload and Documents " src="https://github.com/user-attachments/assets/3505c959-0785-475e-85e2-ed2945709dbe" />
 
 ---
 
