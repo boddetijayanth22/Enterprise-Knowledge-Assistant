@@ -31,11 +31,6 @@ def ask(question, documents, mode):
 
     seen = set()
 
-    print("=" * 80)
-    print("Retrieved Context")
-    print(context)
-    print("=" * 80)
-
     for doc in retrieved_docs:
         file = Path(doc.metadata["source"]).as_posix()
         page = doc.metadata["page"]
