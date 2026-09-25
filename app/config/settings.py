@@ -2,40 +2,37 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    
 
-#Vector Database
+    # Vector Database
 
     qdrant_host: str
     qdrant_port: int
     collection_name: str
 
-
-#Embedding
+    # Embedding
 
     embedding_model: str
 
+    # LLM
 
-#LLM
-
-    groq_api_key: str
+    llm_provider: str = "openrouter"
     llm_model: str
 
+    openrouter_api_key: str | None = None
+    groq_api_key: str | None = None
 
-#Retrieval
+    # Retrieval
 
     search_mode: str = "semantic"
     top_k: int = 5
 
-
-#Chunking
+    # Chunking
 
     chunk_size: int = 1000
     chunk_overlap: int = 200
 
+    # Logging
 
-#Logging
-    
     log_level: str = "INFO"
 
     model_config = SettingsConfigDict(

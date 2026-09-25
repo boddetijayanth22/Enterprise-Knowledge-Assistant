@@ -1,4 +1,4 @@
-from app.llm.gemini import get_llm
+from app.llm.router import get_llm
 from app.prompts.rag_prompt import rag_prompt
 from app.retrieval.retriever import retrieve
 from pathlib import Path
@@ -8,7 +8,7 @@ def ask(question, documents, mode):
     retrieved_docs = retrieve(
         question,
         documents,
-        mode = mode,
+        mode=mode,
     )
 
     context = "\n\n".join(
@@ -25,7 +25,7 @@ def ask(question, documents, mode):
 
     llm = get_llm()
 
-    response = llm.invoke(prompt)
+    response = llm.invoke(prompt.to_string())
 
     sources = []
 

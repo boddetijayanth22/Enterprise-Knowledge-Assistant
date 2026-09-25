@@ -19,7 +19,7 @@ def chat(
     chat_service=Depends(get_chat_service),
 ):
 
-    logger.info("Received by FastAPI:", request.documents)
+    logger.info("Chat request received")
 
     return chat_service(
         request.question,
