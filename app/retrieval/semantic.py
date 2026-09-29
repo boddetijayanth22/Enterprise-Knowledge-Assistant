@@ -11,29 +11,41 @@ from qdrant_client.models import (
     MatchValue,
 )
 
+
 def semantic_retrieve(
     query: str,
+    owner_id: int,
     documents: list[str] | None = None,
     top_k: int = 5,
 ):
     """
-    Retrieve the most relevant document chunks
-    using semantic vector search.
+    Retrieve the most relevant document chunks using semantic vector search.
+
+    Retrieval is always restricted to the authenticated user's documents.
     """
 
-    search_filter = None
+    must_conditions = [
+        FieldCondition(
+            key="owner_id",
+            match=MatchValue(value=owner_id),
+        )
+    ]
+
+    should_conditions = []
 
     if documents:
+        should_conditions = [
+            FieldCondition(
+                key="source",
+                match=MatchValue(value=document),
+            )
+            for document in documents
+        ]
 
-        search_filter = Filter(
-            should=[
-                FieldCondition(
-                    key="source",
-                    match=MatchValue(value=document),
-                )
-                for document in documents
-            ]
-        )
+    search_filter = Filter(
+        must=must_conditions,
+        should=should_conditions if should_conditions else None,
+    )
 
     embedding_model = get_embedding_model()
 
@@ -41,9 +53,11 @@ def semantic_retrieve(
 
     client = get_qdrant_client()
 
-    logger.info(f"Selected documents: {documents}")
-    logger.info(f"Filter: {search_filter}")
-    
+    logger.info(
+        f"Semantic retrieval for owner_id={owner_id}, "
+        f"documents={documents}"
+    )
+
     results = client.query_points(
         collection_name=settings.collection_name,
         query=query_vector,
@@ -51,10 +65,9 @@ def semantic_retrieve(
         limit=top_k,
     ).points
 
-    logger.info(f"Retrieved {len(results)} chunks")
-
-    for result in results:
-        logger.info(f"Matched: {result.payload['source']}")
+    logger.info(
+        f"Retrieved {len(results)} chunks for owner_id={owner_id}"
+    )
 
     retrieved_documents = []
 
@@ -69,7 +82,12 @@ def semantic_retrieve(
                     "page": payload["page"],
                     "source": payload["source"],
                     "score": result.score,
-                },
+                    "owner_id": payload.get("owner_id"),
+                    "classification": payload.get(
+                        "classification",
+                        "INTERNAL",
+                    ),
+                }
             )
         )
 

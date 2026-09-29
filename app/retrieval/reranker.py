@@ -1,6 +1,8 @@
 from langchain_core.documents import Document
 from sentence_transformers import CrossEncoder
+
 from app.utils.logger import logger
+
 
 logger.info("Loading CrossEncoder model...")
 
@@ -8,7 +10,7 @@ MODEL = CrossEncoder(
     "cross-encoder/ms-marco-MiniLM-L-6-v2"
 )
 
-logger.info("Loading CrossEncoder loaded.")
+logger.info("CrossEncoder loaded.")
 
 
 class CrossEncoderReranker:
@@ -28,7 +30,9 @@ class CrossEncoderReranker:
             for document in documents
         ]
 
-        scores = self.model.predict(sentence_pairs)
+        scores = self.model.predict(
+            sentence_pairs
+        )
 
         ranked_documents = sorted(
             zip(documents, scores),
@@ -39,7 +43,13 @@ class CrossEncoderReranker:
         reranked_documents = []
 
         for document, score in ranked_documents[:top_k]:
-            document.metadata["reranker_score"] = float(score)
-            reranked_documents.append(document)
+
+            document.metadata["reranker_score"] = float(
+                score
+            )
+
+            reranked_documents.append(
+                document
+            )
 
         return reranked_documents
