@@ -1,6 +1,8 @@
 import requests
 import streamlit as st
+
 from app.utils.logger import logger
+from frontend.auth import get_auth_headers
 from pydantic import BaseModel
 
 
@@ -26,6 +28,8 @@ def upload_pdf(file):
                 "application/pdf",
             )
         },
+        headers=get_auth_headers(),
+        timeout=60,
     )
 
     logger.info(response.status_code)
@@ -48,7 +52,6 @@ def ask_question(
     logger.info(f"Asking: {BASE_URL}/chat")
     logger.info(f"Question: {question}")
     logger.info(f"Documents sent {documents}")
-    
 
     response = requests.post(
         f"{BASE_URL}/chat",
@@ -57,6 +60,7 @@ def ask_question(
             "documents": documents or [],
             "mode": st.session_state.search_mode,
         },
+        headers=get_auth_headers(),
         timeout=60,
     )
 
@@ -71,11 +75,13 @@ def ask_question(
 
     return response.json()
 
+
 def get_documents():
 
     response = requests.get(
         f"{BASE_URL}/documents",
-        timeout = 30,
+        headers=get_auth_headers(),
+        timeout=30,
     )
 
     try:
@@ -84,14 +90,15 @@ def get_documents():
         st.error("Backend request failed.")
         raise
 
-    return response.json()
+    return response.json()["documents"]
 
 
 def get_stats():
 
     response = requests.get(
         f"{BASE_URL}/stats",
-        timeout = 30,
+        headers=get_auth_headers(),
+        timeout=30,
     )
 
     try:
@@ -99,18 +106,32 @@ def get_stats():
     except requests.HTTPError:
         st.error("Backend request failed.")
         raise
-    
-    return response.json()
+
+    data = response.json()
+
+    return {
+        "documents": data["total_documents"],
+        "chunks": data["total_chunks"],
+        "embedding_model": data["embedding_model"],
+    }
+
 
 def delete_document(filename):
 
-    return requests.delete(
-        f"{BASE_URL}/documents/{filename}"
+    response = requests.delete(
+        f"{BASE_URL}/documents/{filename}",
+        headers=get_auth_headers(),
+        timeout=30,
     )
+
+    return response
+
 
 def download_document(filename):
 
     return requests.get(
         f"{BASE_URL}/documents/{filename}/download",
+        headers=get_auth_headers(),
         stream=True,
+        timeout=30,
     )

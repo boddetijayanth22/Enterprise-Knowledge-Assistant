@@ -1,34 +1,43 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
-from app.schemas.dashboard import (
-    DashboardStats,
-    DocumentInfo,
-)
-
-from app.services.dashboard_service import (
-    get_dashboard_data,
-)
+from app.auth.dependencies import get_current_user
+from app.auth.models import User
+from app.config.settings import settings
+from app.services.document_service import list_documents
 
 router = APIRouter()
 
 
-@router.get(
-    "/documents",
-    response_model=list[DocumentInfo],
-)
-def documents():
+@router.get("/documents")
+def get_documents(
+    current_user: User = Depends(get_current_user),
+):
+    documents = list_documents(
+        owner_id=current_user.id,
+    )
 
-    docs, _ = get_dashboard_data()
+    return {
+        "documents": documents,
+    }
 
-    return docs
 
+@router.get("/stats")
+def get_stats(
+    current_user: User = Depends(get_current_user),
+):
+    documents = list_documents(
+        owner_id=current_user.id,
+    )
 
-@router.get(
-    "/stats",
-    response_model=DashboardStats,
-)
-def stats():
+    total_documents = len(documents)
 
-    _, stats = get_dashboard_data()
+    total_chunks = sum(
+        document["chunks"]
+        for document in documents
+    )
 
-    return stats
+    return {
+        "total_documents": total_documents,
+        "total_chunks": total_chunks,
+        "embedding_model": settings.embedding_model,
+    }

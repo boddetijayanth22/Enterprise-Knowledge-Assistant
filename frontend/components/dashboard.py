@@ -31,7 +31,7 @@ def render_dashboard() -> None:
     with col4:
         st.metric(
             "🗄️ Vector DB",
-            stats["vector_db"],
+            "Qdrant",
         )
 
     st.subheader("⚙ System Information")
@@ -54,7 +54,7 @@ def render_dashboard() -> None:
             f"""
 **Vector Database**
 
-{stats["vector_db"]}
+Qdrant
 """
     )
 

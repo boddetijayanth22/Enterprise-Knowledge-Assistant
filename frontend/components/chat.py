@@ -1,6 +1,6 @@
 import streamlit as st
 
-from state.session import get_current_chat
+from frontend.state.session import get_current_chat
 
 def render_chat():
 

@@ -9,6 +9,7 @@ from app.api.query import router as query_router
 from app.api.dashboard import router as dashboard_router
 from app.api.documents import router as documents_router
 from app.utils.logger import configure_logging
+from app.api.auth import router as auth_router
 
 
 configure_logging()
@@ -26,3 +27,4 @@ app.include_router(router)
 app.include_router(query_router)
 app.include_router(dashboard_router)
 app.include_router(documents_router)
+app.include_router(auth_router)

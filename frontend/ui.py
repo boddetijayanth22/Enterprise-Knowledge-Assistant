@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -11,11 +12,13 @@ from backend_client import ask_question, upload_pdf
 
 from components.sidebar import render_sidebar
 from components.chat import render_chat
-from state.session import get_current_chat
 
-from storage.chat_storage import (
-    save_chat_file,
-)
+from frontend.state.session import get_current_chat
+
+from frontend.auth import get_current_user_id
+from frontend.components.auth import render_auth
+
+from frontend.storage.chat_storage import save_chat_file
 
 
 st.set_page_config(
@@ -23,13 +26,25 @@ st.set_page_config(
     layout="wide",
 )
 
+
+if not render_auth():
+    st.stop()
+
+
 uploaded_file, upload, selected_documents = render_sidebar()
 
 question = render_chat()
 
+
 if question:
 
     current_chat = get_current_chat()
+
+    user_id = get_current_user_id()
+
+    if user_id is None:
+        st.error("Authenticated user not found.")
+        st.stop()
 
     current_chat["messages"].append(
         {
@@ -39,16 +54,21 @@ if question:
     )
 
     if current_chat["title"] == "New Chat":
-    
+
         current_chat["title"] = (
             question[:30] + "..."
             if len(question) > 30
             else question
         )
-    save_chat_file(current_chat)
-    
+
+    save_chat_file(
+        current_chat,
+        user_id,
+    )
+
     with st.spinner(
-        "🔍 Retrieving relevant documents...\n\n🤖 Generating answer..."
+        "🔍 Retrieving relevant documents...\n\n"
+        "🤖 Generating answer..."
     ):
 
         result = ask_question(
@@ -64,9 +84,13 @@ if question:
         }
     )
 
-    save_chat_file(current_chat)
+    save_chat_file(
+        current_chat,
+        user_id,
+    )
 
     st.rerun()
+
 
 if upload:
 
@@ -75,9 +99,12 @@ if upload:
         st.warning("Upload a PDF first.")
 
     else:
+
         with st.spinner("📄 Uploading PDF..."):
 
-            result = upload_pdf(uploaded_file)
+            result = upload_pdf(
+                uploaded_file
+            )
 
         st.success(
             f"✅ {result['filename']} uploaded successfully!"

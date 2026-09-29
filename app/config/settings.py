@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     qdrant_host: str
     qdrant_port: int
     collection_name: str
+    database_url: str = "sqlite:///./data/app.db"
 
     # Embedding
 
@@ -20,6 +21,12 @@ class Settings(BaseSettings):
 
     openrouter_api_key: str | None = None
     groq_api_key: str | None = None
+
+    # Authentication
+
+    jwt_secret_key: str
+    jwt_algorithm: str = "HS256"
+    jwt_access_token_expire_minutes: int = 30
 
     # Retrieval
 

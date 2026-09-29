@@ -47,4 +47,6 @@ qdrant_storage/
 
 # Jupyter
 .ipynb_checkpoints/
->>>>>>> 8e0c2c0 (Release Enterprise Knowledge Assistant v2)
+
+# Local database
+data/app.db
