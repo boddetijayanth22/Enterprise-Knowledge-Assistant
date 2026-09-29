@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 
 from app.api.dependencies import get_chat_service
 from app.auth.dependencies import get_current_user
@@ -16,6 +16,7 @@ router = APIRouter()
     response_model=ChatResponse,
 )
 def chat(
+    http_request: Request,
     request: ChatRequest,
     current_user: User = Depends(get_current_user),
     chat_service=Depends(get_chat_service),
@@ -30,4 +31,5 @@ def chat(
         documents=request.documents,
         mode=request.mode,
         owner_id=current_user.id,
+        request_id=http_request.state.request_id,
     )

@@ -1,7 +1,15 @@
 from pathlib import Path
+
 from app.utils.logger import logger
+from app.security.output_guard import (
+    detect_secret_leakage,
+    redact_secret_leakage,
+)
 from app.llm.router import get_llm
 from app.prompts.rag_prompt import rag_prompt
+from app.security.prompt_injection import detect_prompt_injection
+from app.security.retrieval_guard import detect_retrieval_injection
+from app.security.audit import log_security_event
 from app.retrieval.retriever import retrieve
 from app.privacy.classifier import DataClassification
 from app.privacy.detector import detect_sensitive_data
@@ -14,7 +22,49 @@ def ask(
     documents: list[str] | None,
     mode: str,
     owner_id: int,
+    request_id: str | None = None,
 ):
+
+    injection_result = detect_prompt_injection(question)
+
+    if injection_result["is_injection"]:
+        log_security_event(
+            event_type="PROMPT_INJECTION",
+            owner_id=owner_id,
+            request_id=request_id,
+            action="BLOCK",
+            result="DETECTED",
+            finding_count=len(injection_result["findings"]),
+        )
+
+        logger.warning(
+            "Prompt injection blocked | owner_id=%s | findings=%s",
+            owner_id,
+            len(injection_result["findings"]),
+        )
+
+        return {
+            "answer": (
+                "This request was blocked because it contains "
+                "an unsafe instruction pattern."
+            ),
+            "sources": [],
+        }
+
+    if injection_result["is_injection"]:
+        logger.warning(
+            "Prompt injection blocked | owner_id=%s | findings=%s",
+            owner_id,
+            len(injection_result["findings"]),
+        )
+
+        return {
+            "answer": (
+                "This request was blocked because it contains "
+                "an unsafe instruction pattern."
+            ),
+            "sources": [],
+        }
 
     retrieved_docs = retrieve(
         query=question,
@@ -22,6 +72,44 @@ def ask(
         documents=documents,
         mode=mode,
     )
+
+    retrieval_injection_findings = 0
+
+    for doc in retrieved_docs:
+        result = detect_retrieval_injection(
+            doc.page_content
+        )
+
+        if result["is_injection"]:
+            retrieval_injection_findings += len(
+                result["findings"]
+            )
+
+    if retrieval_injection_findings:
+        log_security_event(
+            event_type="INDIRECT_PROMPT_INJECTION",
+            owner_id=owner_id,
+            request_id=request_id,
+            action="BLOCK",
+            result="DETECTED",
+            finding_count=retrieval_injection_findings,
+        )
+
+        logger.warning(
+            "Indirect prompt injection blocked | "
+            "owner_id=%s | findings=%s",
+            owner_id,
+            retrieval_injection_findings,
+        )
+
+        return {
+            "answer": (
+                "This request cannot be processed because "
+                "the retrieved content contains an unsafe "
+                "instruction pattern."
+            ),
+            "sources": [],
+        }
 
     context = "\n\n".join(
         doc.page_content
@@ -60,6 +148,19 @@ def ask(
         policy_action.value,
     )
 
+    log_security_event(
+        event_type="PRIVACY_POLICY",
+        owner_id=owner_id,
+        request_id=request_id,
+        action=policy_action.value,
+        result=(
+            "SENSITIVE_DATA_DETECTED"
+            if sensitive_result["has_sensitive_data"]
+            else "CLEAR"
+        ),
+        finding_count=len(sensitive_result["findings"]),
+    )
+
     if policy_action == PrivacyAction.BLOCK:
         return {
             "answer": (
@@ -84,6 +185,28 @@ def ask(
     response = llm.invoke(
         prompt.to_string()
     )
+
+    answer = response.content
+
+    secret_result = detect_secret_leakage(answer)
+
+    if secret_result["has_secret"]:
+        log_security_event(
+            event_type="SECRET_LEAKAGE",
+            owner_id=owner_id,
+            request_id=request_id,
+            action="REDACT",
+            result="DETECTED",
+            finding_count=len(secret_result["findings"]),
+        )
+
+        logger.warning(
+            "LLM output secret leakage detected | owner_id=%s | findings=%s",
+            owner_id,
+            len(secret_result["findings"]),
+        )
+
+        answer = redact_secret_leakage(answer)
 
     sources = []
 
@@ -111,6 +234,6 @@ def ask(
             )
 
     return {
-        "answer": response.content,
+        "answer": answer,
         "sources": sources,
     }
