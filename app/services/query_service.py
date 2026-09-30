@@ -1,4 +1,6 @@
+import time
 from pathlib import Path
+from app.config.settings import settings
 
 from app.utils.logger import logger
 from app.security.output_guard import (
@@ -182,8 +184,27 @@ def ask(
 
     llm = get_llm()
 
-    response = llm.invoke(
-        prompt.to_string()
+    llm_start_time = time.perf_counter()
+
+    response = llm.invoke(prompt.to_string())
+
+    llm_latency_ms = round(
+        (time.perf_counter() - llm_start_time) * 1000,
+        2,
+    )
+
+    logger.info(
+        "llm_completed | "
+        "owner_id=%s | "
+        "request_id=%s | "
+        "provider=%s | "
+        "model=%s | "
+        "latency_ms=%s",
+        owner_id,
+        request_id,
+        settings.llm_provider,
+        settings.llm_model,
+        llm_latency_ms,
     )
 
     answer = response.content
