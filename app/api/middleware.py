@@ -16,27 +16,34 @@ async def request_logging_middleware(
 
     start_time = time.perf_counter()
 
-    response = await call_next(request)
+    try:
+        response = await call_next(request)
 
-    latency_ms = round(
-        (time.perf_counter() - start_time) * 1000,
-        2,
-    )
+        return response
 
-    response.headers["X-Request-ID"] = request_id
+    finally:
+        latency_ms = round(
+            (time.perf_counter() - start_time) * 1000,
+            2,
+        )
 
-    logger.info(
-        "request_completed | "
-        "request_id=%s | "
-        "method=%s | "
-        "path=%s | "
-        "status=%s | "
-        "latency_ms=%s",
-        request_id,
-        request.method,
-        request.url.path,
-        response.status_code,
-        latency_ms,
-    )
+        logger.info(
+            "request_completed | "
+            "request_id=%s | "
+            "method=%s | "
+            "path=%s | "
+            "status=%s | "
+            "latency_ms=%s",
+            request_id,
+            request.method,
+            request.url.path,
+            getattr(
+                locals().get("response"),
+                "status_code",
+                "exception",
+            ),
+            latency_ms,
+        )
 
-    return response
+        if "response" in locals():
+            response.headers["X-Request-ID"] = request_id
