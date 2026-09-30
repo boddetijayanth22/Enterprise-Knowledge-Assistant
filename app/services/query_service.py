@@ -150,6 +150,22 @@ def ask(
         policy_action.value,
     )
 
+    logger.info(
+        "llm_policy_decision | "
+        "owner_id=%s | "
+        "request_id=%s | "
+        "provider=%s | "
+        "model=%s | "
+        "classification=%s | "
+        "action=%s",
+        owner_id,
+        request_id,
+        settings.llm_provider,
+        settings.llm_model,
+        classification,
+        policy_action.value,
+    )
+
     log_security_event(
         event_type="PRIVACY_POLICY",
         owner_id=owner_id,
