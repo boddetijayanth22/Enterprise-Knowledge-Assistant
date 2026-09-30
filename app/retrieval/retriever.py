@@ -1,3 +1,5 @@
+import time
+
 from langchain_core.documents import Document
 
 from app.config.settings import settings
@@ -156,7 +158,6 @@ def bm25_retrieve(
         top_k=top_k,
     )
 
-
 def retrieve(
     query: str,
     owner_id: int,
@@ -167,9 +168,11 @@ def retrieve(
 
     mode = mode or SEARCH_MODE
 
+    start_time = time.perf_counter()
+
     if mode == "hybrid_reranker":
 
-        return hybrid_reranker_retrieve(
+        results = hybrid_reranker_retrieve(
             query=query,
             owner_id=owner_id,
             documents=documents,
@@ -178,7 +181,7 @@ def retrieve(
 
     elif mode == "bm25":
 
-        return bm25_retrieve(
+        results = bm25_retrieve(
             query=query,
             owner_id=owner_id,
             documents=documents,
@@ -187,7 +190,7 @@ def retrieve(
 
     elif mode == "semantic":
 
-        return semantic_retrieve(
+        results = semantic_retrieve(
             query=query,
             owner_id=owner_id,
             documents=documents,
@@ -196,7 +199,7 @@ def retrieve(
 
     elif mode == "hybrid":
 
-        return hybrid_retrieve(
+        results = hybrid_retrieve(
             query=query,
             owner_id=owner_id,
             documents=documents,
@@ -209,6 +212,24 @@ def retrieve(
             f"Unknown retrieval mode: {mode}"
         )
 
+    retrieval_latency_ms = round(
+        (time.perf_counter() - start_time) * 1000,
+        2,
+    )
+
+    logger.info(
+        "retrieval_completed | "
+        "owner_id=%s | "
+        "mode=%s | "
+        "results=%s | "
+        "latency_ms=%s",
+        owner_id,
+        mode,
+        len(results),
+        retrieval_latency_ms,
+    )
+
+    return results
 
 def hybrid_retrieve(
     query: str,
