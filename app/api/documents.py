@@ -1,7 +1,15 @@
 from pathlib import Path
 import shutil
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    HTTPException,
+    UploadFile,
+)
+
 from fastapi.responses import FileResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -24,11 +32,13 @@ router = APIRouter()
     status_code=201,
 )
 async def upload_pdf(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
     ingestion_service=Depends(get_ingestion_service),
 ):
+
     if (
         not file.filename
         or (
@@ -72,11 +82,6 @@ async def upload_pdf(
                 detail="You have already uploaded this document.",
             )
 
-        ingestion_service(
-            str(file_path),
-            current_user.id,
-        )
-
         document = Document(
             filename=safe_filename,
             file_hash=file_hash,
@@ -86,6 +91,12 @@ async def upload_pdf(
         db.add(document)
         db.commit()
         db.refresh(document)
+
+        background_tasks.add_task(
+            ingestion_service,
+            str(file_path),
+            current_user.id,
+        )
 
     except HTTPException:
         raise
@@ -103,7 +114,7 @@ async def upload_pdf(
 
     return UploadResponse(
         filename=safe_filename,
-        status="uploaded",
+        status="processing",
     )
 
 @router.delete("/documents/{filename}")
