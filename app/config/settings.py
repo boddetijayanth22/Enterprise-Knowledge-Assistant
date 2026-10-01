@@ -47,5 +47,7 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    rate_limit_requests: int = 30
+    rate_limit_window_seconds: int = 60
 
 settings = Settings()
