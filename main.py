@@ -8,6 +8,7 @@ from app.api.routes import router
 from app.api.query import router as query_router
 from app.api.dashboard import router as dashboard_router
 from app.api.documents import router as documents_router
+from app.api.health import router as health_router
 from app.utils.logger import configure_logging
 from app.api.auth import router as auth_router
 from app.api.observability import router as observability_router
@@ -29,3 +30,4 @@ app.include_router(dashboard_router)
 app.include_router(documents_router)
 app.include_router(auth_router)
 app.include_router(observability_router)
+app.include_router(health_router)
