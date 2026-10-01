@@ -19,6 +19,7 @@ from app.privacy.detector import detect_sensitive_data
 from app.privacy.redactor import redact_sensitive_data
 from app.privacy.policy import PrivacyAction, evaluate_policy
 from app.observability.metrics import metrics
+from app.cache.query_cache import query_cache
 
 def ask(
     question: str,
@@ -72,6 +73,32 @@ def ask(
             ),
             "sources": [],
         }
+
+    cached_result = query_cache.get(
+        question=question,
+        documents=documents,
+        mode=mode,
+        owner_id=owner_id,
+    )
+
+    if cached_result is not None:
+        logger.info(
+            "query_cache_hit | "
+            "owner_id=%s | "
+            "request_id=%s",
+            owner_id,
+            request_id,
+        )
+
+        return cached_result
+
+    logger.info(
+        "query_cache_miss | "
+        "owner_id=%s | "
+        "request_id=%s",
+        owner_id,
+        request_id,
+    )
 
     retrieved_docs = retrieve(
         query=question,
@@ -297,8 +324,26 @@ def ask(
                     "page": page + 1,
                 }
             )
-
-    return {
+            
+    result = {
         "answer": answer,
         "sources": sources,
     }
+
+    query_cache.set(
+        question=question,
+        documents=documents,
+        mode=mode,
+        owner_id=owner_id,
+        value=result,
+    )
+
+    logger.info(
+        "query_cache_set | "
+        "owner_id=%s | "
+        "request_id=%s",
+        owner_id,
+        request_id,
+    )
+
+    return result
