@@ -4,6 +4,7 @@ import uuid
 from fastapi import Request
 
 from app.utils.logger import logger
+from app.observability.metrics import metrics
 
 
 async def request_logging_middleware(
@@ -14,6 +15,8 @@ async def request_logging_middleware(
 
     request.state.request_id = request_id
 
+    metrics.record_request()
+    
     start_time = time.perf_counter()
 
     try:

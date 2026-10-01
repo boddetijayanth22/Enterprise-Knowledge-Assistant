@@ -10,6 +10,7 @@ from app.retrieval.bm25 import BM25Retriever
 from app.retrieval.hybrid import reciprocal_rank_fusion
 from app.retrieval.reranker import CrossEncoderReranker
 from app.retrieval.semantic import semantic_retrieve
+from app.observability.metrics import metrics
 
 from qdrant_client.models import (
     Filter,
@@ -216,6 +217,8 @@ def retrieve(
         (time.perf_counter() - start_time) * 1000,
         2,
     )
+
+    metrics.record_retrieval(retrieval_latency_ms)
 
     logger.info(
         "retrieval_completed | "

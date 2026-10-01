@@ -2,6 +2,7 @@ from fastapi import Request
 from fastapi.responses import JSONResponse
 
 from app.utils.logger import logger
+from app.observability.metrics import metrics
 
 
 async def global_exception_handler(
@@ -13,6 +14,8 @@ async def global_exception_handler(
         "request_id",
         None,
     )
+
+    metrics.record_request_failure()
 
     logger.exception(
         "request_failed | "

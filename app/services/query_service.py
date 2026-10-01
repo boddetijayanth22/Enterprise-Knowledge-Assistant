@@ -17,7 +17,7 @@ from app.privacy.classifier import DataClassification
 from app.privacy.detector import detect_sensitive_data
 from app.privacy.redactor import redact_sensitive_data
 from app.privacy.policy import PrivacyAction, evaluate_policy
-
+from app.observability.metrics import metrics
 
 def ask(
     question: str,
@@ -30,6 +30,8 @@ def ask(
     injection_result = detect_prompt_injection(question)
 
     if injection_result["is_injection"]:
+        metrics.record_security_block()
+
         log_security_event(
             event_type="PROMPT_INJECTION",
             owner_id=owner_id,
@@ -53,17 +55,19 @@ def ask(
             "sources": [],
         }
 
-    if injection_result["is_injection"]:
-        logger.warning(
-            "Prompt injection blocked | owner_id=%s | findings=%s",
+    if documents == []:
+        logger.info(
+            "No documents selected | "
+            "owner_id=%s | "
+            "request_id=%s",
             owner_id,
-            len(injection_result["findings"]),
+            request_id,
         )
 
         return {
             "answer": (
-                "This request was blocked because it contains "
-                "an unsafe instruction pattern."
+                "Please select at least one document "
+                "before asking a question."
             ),
             "sources": [],
         }
@@ -88,6 +92,8 @@ def ask(
             )
 
     if retrieval_injection_findings:
+        metrics.record_security_block()
+
         log_security_event(
             event_type="INDIRECT_PROMPT_INJECTION",
             owner_id=owner_id,
@@ -141,6 +147,8 @@ def ask(
         classification=classification,
         has_sensitive_data=sensitive_result["has_sensitive_data"],
     )
+
+    metrics.record_privacy_action(policy_action.value)
 
     logger.info(
         "Privacy policy decision | classification=%s | "
@@ -209,6 +217,8 @@ def ask(
         2,
     )
 
+    metrics.record_llm(llm_latency_ms)
+
     logger.info(
         "llm_completed | "
         "owner_id=%s | "
@@ -237,13 +247,13 @@ def ask(
             finding_count=len(secret_result["findings"]),
         )
 
+        answer = redact_secret_leakage(answer)
+
         logger.warning(
             "LLM output secret leakage detected | owner_id=%s | findings=%s",
             owner_id,
             len(secret_result["findings"]),
         )
-
-        answer = redact_secret_leakage(answer)
 
     sources = []
 
