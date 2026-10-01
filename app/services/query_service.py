@@ -8,6 +8,7 @@ from app.security.output_guard import (
     redact_secret_leakage,
 )
 from app.llm.router import get_llm
+from app.llm.exceptions import LLMProviderError
 from app.prompts.rag_prompt import rag_prompt
 from app.security.prompt_injection import detect_prompt_injection
 from app.security.retrieval_guard import detect_retrieval_injection
@@ -210,7 +211,24 @@ def ask(
 
     llm_start_time = time.perf_counter()
 
-    response = llm.invoke(prompt.to_string())
+    try:
+        response = llm.invoke(prompt.to_string())
+    except LLMProviderError:
+        logger.error(
+            "llm_provider_failure | "
+            "request_id=%s | "
+            "owner_id=%s",
+            request_id,
+            owner_id,
+        )
+
+        return {
+            "answer": (
+                "The AI service is temporarily unavailable. "
+                "Please try again shortly."
+            ),
+            "sources": [],
+        }
 
     llm_latency_ms = round(
         (time.perf_counter() - llm_start_time) * 1000,
