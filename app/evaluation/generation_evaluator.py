@@ -1,31 +1,31 @@
 from collections.abc import Sequence
 
 
+PROVIDER_FAILURE_MESSAGE = (
+    "The AI service is temporarily unavailable. "
+    "Please try again shortly."
+)
+
+
 def normalize_text(text: str) -> str:
     return " ".join(text.lower().split())
 
 
-def fact_supported(answer: str, fact: str) -> bool:
+def fact_supported(
+    answer: str,
+    fact: Sequence[str],
+) -> bool:
     answer_normalized = normalize_text(answer)
-    fact_normalized = normalize_text(fact)
 
-    if fact_normalized in answer_normalized:
-        return True
-
-    # Handle simple reference variation:
-    # "Python abstracts..." vs "It abstracts..."
-    if fact_normalized.startswith("python "):
-        shortened_fact = fact_normalized[len("python "):]
-
-        if f"it {shortened_fact}" in answer_normalized:
-            return True
-
-    return False
+    return all(
+        term.lower() in answer_normalized
+        for term in fact
+    )
 
 
 def evidence_coverage(
     answer: str,
-    expected_facts: Sequence[str],
+    expected_facts: Sequence[Sequence[str]],
 ) -> float:
     if not expected_facts:
         return 0.0
@@ -50,7 +50,9 @@ def source_coverage(
         for source in returned_sources
     }
 
-    matched_pages = returned_pages.intersection(relevant_pages)
+    matched_pages = returned_pages.intersection(
+        relevant_pages
+    )
 
     return len(matched_pages) / len(relevant_pages)
 
@@ -77,6 +79,13 @@ def evaluate_generation(
     }
 
 
+def is_provider_failure(response: dict) -> bool:
+    return (
+        response.get("answer") == PROVIDER_FAILURE_MESSAGE
+        and not response.get("sources")
+    )
+
+
 def evaluate_dataset(
     dataset,
     ask_fn,
@@ -85,6 +94,8 @@ def evaluate_dataset(
     mode="hybrid_reranker",
 ) -> dict:
     results = []
+    successful_results = []
+    provider_failures = 0
 
     for item in dataset:
         response = ask_fn(
@@ -94,34 +105,65 @@ def evaluate_dataset(
             owner_id=owner_id,
         )
 
+        if is_provider_failure(response):
+            provider_failures += 1
+
+            results.append(
+                {
+                    "question": item["question"],
+                    "answer": response["answer"],
+                    "sources": list(
+                        response.get("sources", [])
+                    ),
+                    "status": "PROVIDER_FAILURE",
+                    "evidence_coverage": None,
+                    "source_coverage": None,
+                }
+            )
+
+            continue
+
         result = evaluate_generation(
             question=item["question"],
             answer=response["answer"],
             sources=response["sources"],
             expected_facts=item["expected_facts"],
-            relevant_pages=set(item["relevant_pages"]),
+            relevant_pages=set(
+                item["relevant_pages"]
+            ),
         )
 
+        result["status"] = "SUCCESS"
+
         results.append(result)
+        successful_results.append(result)
+
+    successful_queries = len(successful_results)
+
+    evidence_average = (
+        sum(
+            result["evidence_coverage"]
+            for result in successful_results
+        ) / successful_queries
+        if successful_queries
+        else 0.0
+    )
+
+    source_average = (
+        sum(
+            result["source_coverage"]
+            for result in successful_results
+        ) / successful_queries
+        if successful_queries
+        else 0.0
+    )
 
     return {
         "mode": mode,
         "queries": len(results),
-        "evidence_coverage": (
-            sum(
-                result["evidence_coverage"]
-                for result in results
-            ) / len(results)
-            if results
-            else 0.0
-        ),
-        "source_coverage": (
-            sum(
-                result["source_coverage"]
-                for result in results
-            ) / len(results)
-            if results
-            else 0.0
-        ),
+        "successful_queries": successful_queries,
+        "provider_failures": provider_failures,
+        "evidence_coverage": evidence_average,
+        "source_coverage": source_average,
         "results": results,
     }
