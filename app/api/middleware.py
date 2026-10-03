@@ -56,6 +56,8 @@ async def request_logging_middleware(
             2,
         )
 
+        metrics.record_request_latency(latency_ms)
+
         logger.info(
             "request_completed | "
             "request_id=%s | "

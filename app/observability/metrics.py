@@ -1,3 +1,4 @@
+from collections import deque
 from threading import Lock
 
 
@@ -22,10 +23,18 @@ class MetricsCollector:
         }
 
         self.security_blocks = 0
+        self.cache_hits = 0
+        self.cache_misses = 0
+        self.request_latencies_ms = deque(maxlen=1000)
+    
 
     def record_request(self):
         with self._lock:
             self.requests_total += 1
+
+    def record_request_latency(self, latency_ms: float):
+        with self._lock:
+            self.request_latencies_ms.append(latency_ms)
 
     def record_request_failure(self):
         with self._lock:
@@ -50,6 +59,34 @@ class MetricsCollector:
         with self._lock:
             self.security_blocks += 1
 
+    def _percentile(self, values: list[float], percentile: float) -> float:
+        if not values:
+            return 0.0
+
+        sorted_values = sorted(values)
+
+        rank = (percentile / 100) * (len(sorted_values) - 1)
+        lower = int(rank)
+        upper = min(lower + 1, len(sorted_values) - 1)
+
+        if lower == upper:
+            return sorted_values[lower]
+
+        weight = rank - lower
+
+        return (
+            sorted_values[lower]
+            + weight * (sorted_values[upper] - sorted_values[lower])
+        )
+
+    def record_cache_hit(self):
+        with self._lock:
+            self.cache_hits += 1
+
+    def record_cache_miss(self):
+        with self._lock:
+            self.cache_misses += 1
+
     def summary(self) -> dict:
 
         with self._lock:
@@ -66,6 +103,18 @@ class MetricsCollector:
                 / self.llm_total
                 if self.llm_total
                 else 0.0
+            )
+
+            request_latencies = list(self.request_latencies_ms)
+
+            request_p50 = self._percentile(
+                request_latencies,
+                50,
+            )
+
+            request_p95 = self._percentile(
+                request_latencies,
+                95,
             )
 
             return {
@@ -86,6 +135,14 @@ class MetricsCollector:
                         llm_avg,
                         2,
                     ),
+                },
+                "latency": {
+                    "p50_ms": round(request_p50, 2),
+                    "p95_ms": round(request_p95, 2),
+                },
+                "cache": {
+                    "hits": self.cache_hits,
+                    "misses": self.cache_misses,
                 },
                 "privacy": self.privacy_actions.copy(),
                 "security": {

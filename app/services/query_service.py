@@ -82,6 +82,8 @@ def ask(
     )
 
     if cached_result is not None:
+        metrics.record_cache_hit()
+
         logger.info(
             "query_cache_hit | "
             "owner_id=%s | "
@@ -92,6 +94,8 @@ def ask(
 
         return cached_result
 
+    metrics.record_cache_miss()
+    
     logger.info(
         "query_cache_miss | "
         "owner_id=%s | "
