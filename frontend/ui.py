@@ -1,3 +1,4 @@
+import logging
 import sys
 from pathlib import Path
 
@@ -20,6 +21,8 @@ from frontend.components.auth import render_auth
 
 from frontend.storage.chat_storage import save_chat_file
 
+
+logger = logging.getLogger(__name__)
 
 st.set_page_config(
     page_title="Enterprise Knowledge Assistant",
@@ -65,11 +68,16 @@ if question:
         current_chat,
         user_id,
     )
+    
+    with st.chat_message("user"):
+        st.markdown(question)
 
-    with st.spinner(
-        "🔍 Retrieving relevant documents...\n\n"
-        "🤖 Generating answer..."
-    ):
+    with st.spinner("🤖 Generating answer..."):
+
+        logger.info(
+            "Selected documents passed to ask_question: %s",
+            selected_documents,
+        )
 
         result = ask_question(
             question,
@@ -93,21 +101,17 @@ if question:
 
 
 if upload:
-
     if uploaded_file is None:
-
         st.warning("Upload a PDF first.")
-
     else:
-
         with st.spinner("📄 Uploading PDF..."):
-
             result = upload_pdf(
                 uploaded_file
             )
 
-        st.success(
-            f"✅ {result['filename']} uploaded successfully!"
-        )
+        if result:
+            st.success(
+                f"✅ {result['filename']} uploaded successfully!"
+            )
 
-        st.rerun()
+            st.rerun()

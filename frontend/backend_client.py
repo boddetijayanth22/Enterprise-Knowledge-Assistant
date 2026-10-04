@@ -1,18 +1,18 @@
+import logging
+import os
+
 import requests
 import streamlit as st
 
-from app.utils.logger import logger
 from frontend.auth import get_auth_headers
-from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
-class ChatRequest(BaseModel):
-    question: str
-    documents: list[str] = []
-    mode: str
-
-
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = os.getenv(
+    "BACKEND_URL",
+    "http://127.0.0.1:8000",
+)
 
 
 def upload_pdf(file):
@@ -35,11 +35,31 @@ def upload_pdf(file):
     logger.info(response.status_code)
     logger.info(response.text)
 
+    if response.status_code == 409:
+        try:
+            detail = response.json().get(
+                "detail",
+                "Document already exists.",
+            )
+        except ValueError:
+            detail = "Document already exists."
+
+        st.warning(f"⚠️ {detail}")
+        return None
+
     try:
         response.raise_for_status()
     except requests.HTTPError:
-        st.error("Backend request failed.")
-        raise
+        try:
+            detail = response.json().get(
+                "detail",
+                response.text,
+            )
+        except ValueError:
+            detail = response.text
+
+        st.error(f"❌ Upload failed: {detail}")
+        return None
 
     return response.json()
 
@@ -51,13 +71,13 @@ def ask_question(
 
     logger.info(f"Asking: {BASE_URL}/chat")
     logger.info(f"Question: {question}")
-    logger.info(f"Documents sent {documents}")
+    logger.info(f"Documents sent: {documents}")
 
     response = requests.post(
         f"{BASE_URL}/chat",
         json={
             "question": question,
-            "documents": documents or [],
+            "documents": documents,
             "mode": st.session_state.search_mode,
         },
         headers=get_auth_headers(),
@@ -104,8 +124,16 @@ def get_stats():
     try:
         response.raise_for_status()
     except requests.HTTPError:
-        st.error("Backend request failed.")
-        raise
+        try:
+            detail = response.json().get(
+                "detail",
+                response.text,
+            )
+        except ValueError:
+            detail = response.text
+
+        st.error(f"Upload failed: {detail}")
+        return None
 
     data = response.json()
 

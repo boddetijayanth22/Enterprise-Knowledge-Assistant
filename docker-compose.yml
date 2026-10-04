@@ -1,0 +1,36 @@
+services:
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: enterprise-rag-qdrant
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  backend:
+    image: enterprise-rag-backend:latest
+    container_name: enterprise-rag-backend
+    depends_on:
+      - qdrant
+    env_file:
+      - .env
+    environment:
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+    ports:
+      - "8000:8000"
+    volumes:
+      - app_data:/app/data
+
+  frontend:
+    image: enterprise-rag-frontend:latest
+    container_name: enterprise-rag-frontend
+    depends_on:
+      - backend
+    environment:
+      BACKEND_URL: http://backend:8000
+    ports:
+      - "8501:8501"
+
+volumes:
+  qdrant_data:
+  app_data:

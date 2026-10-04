@@ -1,3 +1,4 @@
+import logging
 import streamlit as st
 
 from backend_client import (
@@ -6,10 +7,12 @@ from backend_client import (
     download_document,
 )
 
+logger = logging.getLogger(__name__)
+
 
 def render_knowledge_base():
 
-    st.markdown("## 📚 Documents")
+    st.markdown(" 📚 Documents")
     st.caption(
         "Search, manage and delete indexed documents."
     )
@@ -181,3 +184,10 @@ Upload your first PDF above to start building your knowledge base.
                         st.session_state.confirm_delete = None
 
                         st.rerun()
+                        
+    logger.info(
+        "Selected documents from knowledge base: %s",
+        selected_documents,
+    )
+
+    return selected_documents
