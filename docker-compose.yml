@@ -3,14 +3,38 @@ services:
   qdrant:
     image: qdrant/qdrant:latest
     container_name: enterprise-rag-qdrant
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/6333'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     volumes:
       - qdrant_data:/qdrant/storage
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
 
   backend:
     image: enterprise-rag-backend:latest
     container_name: enterprise-rag-backend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
-      - qdrant
+      qdrant:
+        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -20,16 +44,32 @@ services:
       - "8000:8000"
     volumes:
       - app_data:/app/data
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
 
   frontend:
     image: enterprise-rag-frontend:latest
     container_name: enterprise-rag-frontend
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       - backend
     environment:
       BACKEND_URL: http://backend:8000
     ports:
       - "8501:8501"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
 
 volumes:
   qdrant_data:
