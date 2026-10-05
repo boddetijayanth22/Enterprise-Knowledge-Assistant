@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from app.api.exception_handlers import (
     register_exception_handlers,
 )
+from app.config.settings import settings
 from app.api.middleware import request_logging_middleware
 from app.api.routes import router
 from app.api.query import router as query_router
@@ -12,12 +13,27 @@ from app.api.health import router as health_router
 from app.utils.logger import configure_logging
 from app.api.auth import router as auth_router
 from app.api.observability import router as observability_router
+from fastapi.middleware.cors import CORSMiddleware
+
 
 configure_logging()
 
 app = FastAPI(
     title="Enterprise RAG Assistant",
     version="1.0.0",
+    docs_url="/docs" if settings.environment == "development" else None,
+    redoc_url="/redoc" if settings.environment == "development" else None,
+    openapi_url="/openapi.json"
+    if settings.environment == "development"
+    else None,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.middleware("http")(request_logging_middleware)

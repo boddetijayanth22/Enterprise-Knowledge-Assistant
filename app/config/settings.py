@@ -42,11 +42,20 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
+    # CORS
+
+    cors_origins: list[str] = ["http://localhost:8501"]
+
+    # Environment
+    
+    environment: str = "development"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
     )
 
+    llm_max_tokens: int = 1024
     rate_limit_requests: int = 30
     rate_limit_window_seconds: int = 60
     query_cache_ttl_seconds: int = 300
