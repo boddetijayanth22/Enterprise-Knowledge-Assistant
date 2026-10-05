@@ -4,6 +4,8 @@ services:
     image: qdrant/qdrant:latest
     container_name: enterprise-rag-qdrant
     restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: json-file
       options:
@@ -29,6 +31,8 @@ services:
     restart: unless-stopped
     cap_drop:
       - ALL
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: json-file
       options:
@@ -62,6 +66,8 @@ services:
     restart: unless-stopped
     cap_drop:
       - ALL
+    security_opt:
+      - no-new-privileges:true
     logging:
       driver: json-file
       options:
