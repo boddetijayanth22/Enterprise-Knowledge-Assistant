@@ -27,6 +27,8 @@ services:
     image: enterprise-rag-backend:latest
     container_name: enterprise-rag-backend
     restart: unless-stopped
+    cap_drop:
+      - ALL
     logging:
       driver: json-file
       options:
@@ -42,6 +44,9 @@ services:
       QDRANT_PORT: 6333
     ports:
       - "8000:8000"
+    read_only: true
+    tmpfs:
+      - /tmp
     volumes:
       - app_data:/app/data
     deploy:
@@ -54,6 +59,8 @@ services:
     image: enterprise-rag-frontend:latest
     container_name: enterprise-rag-frontend
     restart: unless-stopped
+    cap_drop:
+      - ALL
     logging:
       driver: json-file
       options:
@@ -65,6 +72,9 @@ services:
       BACKEND_URL: http://backend:8000
     ports:
       - "8501:8501"
+    read_only: true
+    tmpfs:
+      - /tmp
     deploy:
       resources:
         limits:
