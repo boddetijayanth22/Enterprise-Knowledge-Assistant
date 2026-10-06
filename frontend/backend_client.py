@@ -121,6 +121,13 @@ def get_stats():
         timeout=30,
     )
 
+    if response.status_code == 429:
+        st.warning(
+            "⚠️ Dashboard is temporarily rate limited. "
+            "Please try again shortly."
+        )
+        return None
+
     try:
         response.raise_for_status()
     except requests.HTTPError:
@@ -132,7 +139,10 @@ def get_stats():
         except ValueError:
             detail = response.text
 
-        st.error(f"Upload failed: {detail}")
+        st.error(
+            f"❌ Unable to load dashboard statistics: "
+            f"{detail}"
+        )
         return None
 
     data = response.json()

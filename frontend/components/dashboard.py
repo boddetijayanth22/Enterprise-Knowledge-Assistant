@@ -2,11 +2,19 @@ import streamlit as st
 
 from backend_client import get_stats
 
+
 def render_dashboard() -> None:
 
     stats = get_stats()
 
     st.markdown("## 📊 Dashboard")
+
+    if stats is None:
+        st.warning(
+            "⚠️ Dashboard statistics are temporarily unavailable. "
+            "Please try again shortly."
+        )
+        return
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -35,11 +43,10 @@ def render_dashboard() -> None:
         )
 
     st.subheader("⚙ System Information")
-        
+
     left, right = st.columns(2)
 
     with left:
-
         st.info(
             f"""
 **Embedding Model**
@@ -49,19 +56,19 @@ def render_dashboard() -> None:
         )
 
     with right:
-
         st.success(
-            f"""
+            """
 **Vector Database**
 
 Qdrant
 """
-    )
+        )
 
     mode = st.session_state.get(
         "selected_mode",
-         "Semantic"
+        "Semantic",
     )
+
     st.write(
         f"Current Search Mode: **{mode}**"
     )
