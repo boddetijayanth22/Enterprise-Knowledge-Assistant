@@ -12,6 +12,14 @@ jobs:
   test:
     name: Test Application
     runs-on: ubuntu-latest
+    
+    env:
+      QDRANT_HOST: localhost
+      QDRANT_PORT: "6333"
+      COLLECTION_NAME: enterprise_rag_ci
+      EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
+      LLM_MODEL: openai/gpt-oss-120b
+      JWT_SECRET_KEY: ci-test-secret-key
 
     steps:
       - name: Checkout repository
