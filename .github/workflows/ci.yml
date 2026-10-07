@@ -12,7 +12,13 @@ jobs:
   test:
     name: Test Application
     runs-on: ubuntu-latest
-    
+
+    services:
+      qdrant:
+        image: qdrant/qdrant:v1.18.2
+        ports:
+          - 6333:6333
+
     env:
       QDRANT_HOST: localhost
       QDRANT_PORT: "6333"
@@ -37,6 +43,21 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.docker.txt
           python -m pip install pytest
+
+      - name: Wait for Qdrant
+        run: |
+          for i in {1..30}; do
+            if curl --fail --silent http://localhost:6333/healthz > /dev/null; then
+              echo "Qdrant is ready"
+              break
+            fi
+            echo "Waiting for Qdrant..."
+            sleep 2
+          done
+
+      - name: Initialize Qdrant
+        run: |
+          python -m scripts.init_qdrant
 
       - name: Compile application
         run: |
