@@ -37,6 +37,8 @@ data/processed/*
 data/chats/*
 !data/chats/.gitkeep
 
+data/evaluation/*.pdf
+
 # Vector DB
 qdrant_storage/
 
