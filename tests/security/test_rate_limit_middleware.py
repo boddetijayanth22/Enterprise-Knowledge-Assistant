@@ -20,15 +20,20 @@ def test_rate_limit_middleware_returns_429(monkeypatch):
         "rate_limiter",
         limiter,
     )
+    monkeypatch.setattr(
+    	middleware_module.settings,
+    	"rate_limit_requests",
+    	1,
+    )
 
-    @app.get("/test")
+    @app.post("/test")
     def test_endpoint():
         return {"status": "ok"}
 
     client = TestClient(app)
 
-    first_response = client.get("/test")
-    second_response = client.get("/test")
+    first_response = client.post("/test")
+    second_response = client.post("/test")
 
     assert first_response.status_code == 200
 
