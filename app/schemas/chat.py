@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class ChatRequest(BaseModel):
     question: str
-    documents: list[str]
-    mode: str = "semantic"
+    documents: list[str] | None = Field(default=None)
+    mode: str
     
 
 class Source(BaseModel):

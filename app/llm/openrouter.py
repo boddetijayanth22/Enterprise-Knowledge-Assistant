@@ -4,6 +4,7 @@ from langchain_core.messages import AIMessage
 from app.config.settings import settings
 from app.llm.exceptions import LLMProviderError
 from app.llm.retry import retry_with_backoff
+from app.utils.logger import logger
 
 
 class OpenRouterLLM:
@@ -26,13 +27,20 @@ class OpenRouterLLM:
                     }
                 ],
                 temperature=0,
+                max_tokens=settings.llm_max_tokens,
             )
 
         try:
             response = retry_with_backoff(call_provider)
         except Exception as exc:
+            logger.error(
+                "openrouter_request_failed | "
+                "error_type=%s | "
+                "status_code=%s",
+                type(exc).__name__,
+                getattr(exc, "status_code", None),
+            )
             raise LLMProviderError("openrouter") from exc
-
         return AIMessage(
             content=response.choices[0].message.content
         )
