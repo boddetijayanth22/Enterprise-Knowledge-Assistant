@@ -1,8 +1,12 @@
+import os
 import requests
 import streamlit as st
 
 
-BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_URL = os.getenv(
+    "BACKEND_URL",
+    "http://127.0.0.1:8000",
+)
 
 
 def _reset_user_session_state():
@@ -37,10 +41,8 @@ def login(username: str, password: str):
 
     access_token = data["access_token"]
 
-    # Store token temporarily so /auth/me can authenticate.
     st.session_state.access_token = access_token
 
-    # Get the authenticated user's identity.
     me_response = requests.get(
         f"{BACKEND_URL}/auth/me",
         headers={
@@ -59,10 +61,8 @@ def login(username: str, password: str):
 
     user = me_response.json()
 
-    # Reset any previous user's Streamlit state.
     _reset_user_session_state()
 
-    # Store the authenticated user's identity.
     st.session_state.user_id = user["id"]
     st.session_state.username = user["username"]
     st.session_state.user_role = user["role"]
