@@ -75,6 +75,23 @@ async def upload_pdf(
         )
 
         if existing_document:
+            if existing_document.status == "failed":
+                existing_document.status = "processing"
+                db.commit()
+
+                background_tasks.add_task(
+                    ingestion_service,
+                    str(file_path),
+                    current_user.id,
+                    existing_document.id,
+                    True,
+                )
+
+                return UploadResponse(
+                    filename=safe_filename,
+                    status="processing",
+                )
+
             file_path.unlink()
 
             raise HTTPException(
@@ -96,6 +113,7 @@ async def upload_pdf(
             ingestion_service,
             str(file_path),
             current_user.id,
+            document.id,
         )
 
     except HTTPException:

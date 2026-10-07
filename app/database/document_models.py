@@ -30,6 +30,12 @@ class Document(Base):
         index=True,
     )
 
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        default="processing",
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
