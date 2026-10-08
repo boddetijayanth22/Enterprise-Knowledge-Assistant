@@ -1,7 +1,7 @@
 # 🚀 Enterprise Knowledge Assistant
 
 \<p *align*="center">
-  \<img src="assets/image.png" alt="Enterprise Knowledge Assistant Banner" width="100%">
+  \<img src="assets/image.png" alt="Enterprise Knowledge Assistant Banner" width="150%">
 \</p>
 
 <p align="center">
