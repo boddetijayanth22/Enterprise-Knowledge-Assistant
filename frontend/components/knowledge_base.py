@@ -12,9 +12,10 @@ logger = logging.getLogger(__name__)
 
 def render_knowledge_base():
 
-    st.markdown(" 📚 Documents")
+    st.markdown("📚 Documents")
+
     st.caption(
-        "Search, manage and delete indexed documents."
+        "Search, manage and delete documents in your knowledge base."
     )
 
     documents = get_documents()
@@ -48,30 +49,48 @@ Upload your first PDF above to start building your knowledge base.
 
     for document in filtered_documents:
 
+        filename = document["filename"]
+        status = document.get("status", "completed")
+
         with st.container(border=True):
 
             col1, col2 = st.columns([9, 1])
 
             with col1:
 
+                selectable = status == "completed"
+
                 checked = st.checkbox(
-                    f"📄 {document['filename']}",
-                    value=True,
-                    key=f"select_{document['filename']}",
+                    f"📄 {filename}",
+                    value=selectable,
+                    disabled=not selectable,
+                    key=f"select_{filename}",
                 )
 
                 col_a, col_b = st.columns(2)
 
                 with col_a:
-                    st.caption(f"🧩 Chunks: {document['chunks']}")
 
-                with col_b: 
-                    st.caption("✅ Indexed")
-
-                if checked:
-                    selected_documents.append(
-                        document["filename"]
+                    st.caption(
+                        f"🧩 Chunks: {document.get('chunks', 0)}"
                     )
+
+                with col_b:
+
+                    if status == "completed":
+                        st.caption("✅ Indexed")
+
+                    elif status == "processing":
+                        st.caption("⏳ Processing")
+
+                    elif status == "failed":
+                        st.caption("❌ Failed")
+
+                    else:
+                        st.caption(f"ℹ️ {status.title()}")
+
+                if checked and selectable:
+                    selected_documents.append(filename)
 
             with col2:
 
@@ -79,35 +98,34 @@ Upload your first PDF above to start building your knowledge base.
 
                     if st.button(
                         "👁 View Details",
-                        key=f"details_{document['filename']}",
+                        key=f"details_{filename}",
                         use_container_width=True,
                     ):
+
                         st.session_state.selected_document = document
 
                         st.rerun()
 
-                    response = download_document(document["filename"])
-                    
+                    response = download_document(filename)
+
                     if response.status_code == 200:
 
                         st.download_button(
                             "⬇ Download",
                             data=response.content,
-                            file_name=document["filename"],
+                            file_name=filename,
                             mime="application/pdf",
                             use_container_width=True,
-                            key=f"download_{document['filename']}",
+                            key=f"download_{filename}",
                         )
 
                     if st.button(
                         "🗑 Delete",
-                        key=f"delete_{document['filename']}",
+                        key=f"delete_{filename}",
                         use_container_width=True,
                     ):
 
-                        st.session_state.confirm_delete = (
-                            document["filename"]
-                        )
+                        st.session_state.confirm_delete = filename
 
                         st.rerun()
 
@@ -122,20 +140,24 @@ Upload your first PDF above to start building your knowledge base.
                 ):
 
                     st.write(
-                        f"**Filename:** {document['filename']}"
+                        f"**Filename:** {filename}"
                     )
 
                     st.write(
-                        f"**Chunks:** {document['chunks']}"
+                        f"**Status:** {status.title()}"
+                    )
+
+                    st.write(
+                        f"**Chunks:** {document.get('chunks', 0)}"
                     )
 
             if (
                 st.session_state.get("confirm_delete")
-                == document["filename"]
+                == filename
             ):
 
                 st.warning(
-                    f"Delete **{document['filename']}**?"
+                    f"Delete **{filename}**?"
                 )
 
                 yes_col, cancel_col = st.columns(2)
@@ -144,16 +166,14 @@ Upload your first PDF above to start building your knowledge base.
 
                     if st.button(
                         "Yes",
-                        key=f"yes_{document['filename']}",
+                        key=f"yes_{filename}",
                     ):
 
                         with st.spinner(
                             "Deleting document..."
                         ):
 
-                            response = delete_document(
-                                document["filename"]
-                            )
+                            response = delete_document(filename)
 
                         if response.status_code == 200:
 
@@ -167,10 +187,15 @@ Upload your first PDF above to start building your knowledge base.
 
                         else:
 
-                            detail = response.json().get(
-                                "detail",
-                                "Failed to delete document.",
-                            )
+                            try:
+                                detail = response.json().get(
+                                    "detail",
+                                    "Failed to delete document.",
+                                )
+                            except ValueError:
+                                detail = (
+                                    "Failed to delete document."
+                                )
 
                             st.error(detail)
 
@@ -178,13 +203,13 @@ Upload your first PDF above to start building your knowledge base.
 
                     if st.button(
                         "Cancel",
-                        key=f"cancel_{document['filename']}",
+                        key=f"cancel_{filename}",
                     ):
 
                         st.session_state.confirm_delete = None
 
                         st.rerun()
-                        
+
     logger.info(
         "Selected documents from knowledge base: %s",
         selected_documents,

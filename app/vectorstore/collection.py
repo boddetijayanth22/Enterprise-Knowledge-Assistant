@@ -12,7 +12,7 @@ if client.collection_exists(settings.collection_name):
 client.create_collection(
     collection_name=settings.collection_name,
     vectors_config=VectorParams(
-        size=384,      # BAAI/bge-small-en-v1.5
+        size=384,     
         distance=Distance.COSINE,
     ),
 )

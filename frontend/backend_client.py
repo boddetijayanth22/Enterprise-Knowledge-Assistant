@@ -113,6 +113,27 @@ def get_documents():
     return response.json()["documents"]
 
 
+def get_document_statuses():
+    response = requests.get(
+        f"{BASE_URL}/documents/status",
+        headers=get_auth_headers(),
+        timeout=10,
+    )
+
+    try:
+        response.raise_for_status()
+    except requests.HTTPError:
+        try:
+            detail = response.json().get("detail", response.text)
+        except ValueError:
+            detail = response.text
+
+        st.error(f"❌ Failed to get document status: {detail}")
+        return []
+
+    return response.json()["documents"]
+
+
 def get_stats():
 
     response = requests.get(

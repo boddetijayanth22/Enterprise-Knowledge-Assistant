@@ -9,7 +9,7 @@ def render_chat():
     st.title("Enterprise Knowledge Assistant")
 
     st.caption(
-        "Semantic Search powered by Gemini + Qdrant"
+        "Multi-Strategy Retrieval powered by Qdrant, FastAPI, and LLMs"
     )
 
     st.divider()

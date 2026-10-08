@@ -52,7 +52,6 @@ def save_chat_file(chat, user_id: int):
 
     init_storage(user_id)
 
-    # Prevent saving a chat belonging to another user.
     if chat.get("user_id") != user_id:
         raise PermissionError("Chat does not belong to this user.")
 
@@ -80,7 +79,6 @@ def load_chat_file(chat_id, user_id: int):
     with open(chat_path, "r", encoding="utf-8") as file:
         chat = json.load(file)
 
-    # Defense-in-depth ownership check.
     if chat.get("user_id") != user_id:
         return None
 
@@ -100,7 +98,6 @@ def list_chat_files(user_id: int):
         with open(chat_file, "r", encoding="utf-8") as file:
             chat = json.load(file)
 
-        # Ignore files that don't belong to this user.
         if chat.get("user_id") != user_id:
             continue
 

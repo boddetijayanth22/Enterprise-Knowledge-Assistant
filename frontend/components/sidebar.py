@@ -11,14 +11,14 @@ def render_sidebar():
     st.markdown("# Enterprise Knowledge Assistant")
 
     st.caption(
-        "Multi-Strategy Retrieval powered by Gemini + Qdrant and FastAPI"
+        "Multi-Strategy Retrieval powered by Qdrant, FastAPI, and LLMs"
     )
 
     st.divider()
 
     render_chat_sidebar()
 
-    uploaded_file, upload = render_upload_panel()
+    uploaded_files, upload = render_upload_panel()
 
     selected_documents = render_knowledge_base()
 
@@ -33,7 +33,7 @@ def render_sidebar():
         st.rerun()
 
     return (
-        uploaded_file,
+        uploaded_files,
         upload,
         selected_documents,
     )

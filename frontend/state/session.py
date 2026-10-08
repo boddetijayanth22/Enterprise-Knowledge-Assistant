@@ -25,7 +25,6 @@ def initialize_session():
         != user_id
     ):
 
-        # Clear any previous user's chat state.
         st.session_state.pop(
             "current_chat",
             None,

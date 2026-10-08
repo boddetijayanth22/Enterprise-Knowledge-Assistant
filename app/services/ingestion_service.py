@@ -1,3 +1,4 @@
+from time import perf_counter
 from uuid import uuid4
 from pathlib import Path
 
@@ -85,6 +86,7 @@ def ingest_pdf(
                         ]
                     ),
                 )
+
             else:
                 logger.warning(
                     "PDF already indexed. Skipping....."
@@ -96,22 +98,54 @@ def ingest_pdf(
 
                 return
 
+        load_start = perf_counter()
+
         logger.info("Loading PDF.....")
+
         documents = load_pdf(pdf_path)
 
+        logger.info(
+            "PDF loading completed in %.2f seconds.",
+            perf_counter() - load_start,
+        )
+
+        chunk_start = perf_counter()
+
         logger.info("Chunking.....")
+
         chunks = split_documents(documents)
+
+        logger.info(
+            "Chunking completed: %s chunks in %.2f seconds.",
+            len(chunks),
+            perf_counter() - chunk_start,
+        )
 
         embedding_model = get_embedding_model()
 
-        logger.info("Generating embeddings...")
+        embedding_start = perf_counter()
+
+        logger.info(
+            "Generating embeddings for %s chunks...",
+            len(chunks),
+        )
+
+        texts = [
+            chunk.page_content
+            for chunk in chunks
+        ]
+
+        vectors = embedding_model.embed_documents(texts)
+
+        logger.info(
+            "Embedding completed for %s chunks in %.2f seconds.",
+            len(vectors),
+            perf_counter() - embedding_start,
+        )
 
         points = []
 
-        for chunk in chunks:
-            vector = embedding_model.embed_query(
-                chunk.page_content
-            )
+        for chunk, vector in zip(chunks, vectors):
 
             points.append(
                 PointStruct(
@@ -128,11 +162,18 @@ def ingest_pdf(
                 )
             )
 
+        qdrant_start = perf_counter()
+
         logger.info("Uploading vectors to Qdrant...")
 
         client.upsert(
             collection_name=settings.collection_name,
             points=points,
+        )
+
+        logger.info(
+            "Qdrant upload completed in %.2f seconds.",
+            perf_counter() - qdrant_start,
         )
 
         document = db.get(Document, document_id)

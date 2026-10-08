@@ -21,7 +21,6 @@ from qdrant_client.models import (
 
 SEARCH_MODE = settings.search_mode
 
-# Cache is now isolated by user + document selection.
 BM25_CACHE: dict[
     tuple[int, tuple[str, ...]],
     BM25Retriever,
@@ -89,16 +88,112 @@ def load_documents(
                         "classification",
                         "INTERNAL",
                     ),
-                }
+                },
             )
         )
 
     logger.info(
-        f"Loaded {len(loaded_documents)} chunks "
-        f"for owner_id={owner_id}"
+        "Loaded %s chunks for owner_id=%s",
+        len(loaded_documents),
+        owner_id,
     )
 
     return loaded_documents
+
+
+def expand_page_context(
+    retrieved_documents: list[Document],
+    owner_id: int,
+    documents: list[str] | None = None,
+) -> list[Document]:
+    """
+    Expand retrieved chunks with other chunks from the same
+    source and PDF page.
+
+    This improves context completeness when a logical answer
+    spans multiple chunks on the same PDF page.
+    """
+
+    if not retrieved_documents:
+        return []
+
+    client = get_qdrant_client()
+
+    expanded_documents = []
+    seen_chunks = set()
+
+    for document in retrieved_documents:
+
+        source = document.metadata["source"]
+        page = int(document.metadata["page"])
+
+        must_conditions = [
+            FieldCondition(
+                key="owner_id",
+                match=MatchValue(value=owner_id),
+            ),
+            FieldCondition(
+                key="source",
+                match=MatchValue(value=source),
+            ),
+            FieldCondition(
+                key="page",
+                match=MatchValue(value=page),
+            ),
+        ]
+
+        if documents and source not in documents:
+            continue
+
+        page_filter = Filter(
+            must=must_conditions,
+        )
+
+        points, _ = client.scroll(
+            collection_name=settings.collection_name,
+            scroll_filter=page_filter,
+            limit=100,
+            with_payload=True,
+        )
+
+        for point in points:
+
+            payload = point.payload
+
+            chunk_key = (
+                source,
+                page,
+                payload["text"],
+            )
+
+            if chunk_key in seen_chunks:
+                continue
+
+            seen_chunks.add(chunk_key)
+
+            expanded_documents.append(
+                Document(
+                    page_content=payload["text"],
+                    metadata={
+                        "page": payload["page"],
+                        "source": payload["source"],
+                        "owner_id": payload.get("owner_id"),
+                        "classification": payload.get(
+                            "classification",
+                            "INTERNAL",
+                        ),
+                    },
+                )
+            )
+
+    logger.info(
+        "Expanded retrieval context | "
+        "original_chunks=%s | expanded_chunks=%s",
+        len(retrieved_documents),
+        len(expanded_documents),
+    )
+
+    return expanded_documents
 
 
 def bm25_retrieve(
@@ -143,21 +238,24 @@ def bm25_retrieve(
         BM25_CACHE[cache_key] = retriever
 
         logger.info(
-            f"Created BM25 index for owner_id={owner_id}, "
-            f"documents={document_key}"
+            "Created BM25 index for owner_id=%s, documents=%s",
+            owner_id,
+            document_key,
         )
 
     else:
 
         logger.info(
-            f"Using cached BM25 index for owner_id={owner_id}, "
-            f"documents={document_key}"
+            "Using cached BM25 index for owner_id=%s, documents=%s",
+            owner_id,
+            document_key,
         )
 
     return BM25_CACHE[cache_key].retrieve(
         query=query,
         top_k=top_k,
     )
+
 
 def retrieve(
     query: str,
@@ -213,26 +311,37 @@ def retrieve(
             f"Unknown retrieval mode: {mode}"
         )
 
+    expanded_results = expand_page_context(
+        retrieved_documents=results,
+        owner_id=owner_id,
+        documents=documents,
+    )
+
     retrieval_latency_ms = round(
         (time.perf_counter() - start_time) * 1000,
         2,
     )
 
-    metrics.record_retrieval(retrieval_latency_ms)
+    metrics.record_retrieval(
+        retrieval_latency_ms
+    )
 
     logger.info(
         "retrieval_completed | "
         "owner_id=%s | "
         "mode=%s | "
         "results=%s | "
+        "expanded_results=%s | "
         "latency_ms=%s",
         owner_id,
         mode,
         len(results),
+        len(expanded_results),
         retrieval_latency_ms,
     )
 
-    return results
+    return expanded_results
+
 
 def hybrid_retrieve(
     query: str,
@@ -255,10 +364,46 @@ def hybrid_retrieve(
         top_k=top_k,
     )
 
-    return reciprocal_rank_fusion(
+    logger.info(
+        "HYBRID SEMANTIC | query=%s | results=%s",
+        query,
+        len(semantic_results),
+    )
+
+    for rank, document in enumerate(
+        semantic_results,
+        start=1,
+    ):
+        logger.info(
+            "HYBRID SEMANTIC RESULT | rank=%s | source=%s | page=%s",
+            rank,
+            document.metadata.get("source"),
+            document.metadata.get("page"),
+        )
+
+    logger.info(
+        "HYBRID BM25 | query=%s | results=%s",
+        query,
+        len(bm25_results),
+    )
+
+    for rank, document in enumerate(
+        bm25_results,
+        start=1,
+    ):
+        logger.info(
+            "HYBRID BM25 RESULT | rank=%s | source=%s | page=%s",
+            rank,
+            document.metadata.get("source"),
+            document.metadata.get("page"),
+        )
+
+    fused_results = reciprocal_rank_fusion(
         semantic_results,
         bm25_results,
-    )[:top_k]
+    )
+
+    return fused_results[:top_k]
 
 
 def hybrid_reranker_retrieve(

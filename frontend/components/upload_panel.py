@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-def render_upload_panel() -> tuple[object, bool]:
+def render_upload_panel() -> tuple[list[object], bool]:
 
     st.markdown("## 📤 Upload Documents")
 
@@ -9,11 +9,34 @@ def render_upload_panel() -> tuple[object, bool]:
         "Upload one or more PDF documents to your knowledge base."
     )
 
-    uploaded_file = st.file_uploader(
-        "Choose a PDF",
+    uploaded_files = st.file_uploader(
+        "Choose PDF documents",
         type=["pdf"],
+        accept_multiple_files=True,
+        key="document_uploader",
+        help=(
+            "Select multiple PDFs at once using Ctrl/Shift, "
+            "or click + to add more files."
+        ),
         label_visibility="collapsed",
     )
+
+    if uploaded_files:
+        st.info(
+            f"📄 {len(uploaded_files)} PDF(s) currently selected"
+        )
+
+        for index, uploaded_file in enumerate(
+            uploaded_files,
+            start=1,
+        ):
+            st.write(
+                f"{index}. `{uploaded_file.name}` "
+                f"— {uploaded_file.size / (1024 * 1024):.2f} MB"
+            )
+
+    else:
+        st.caption("No PDF selected.")
 
     upload = st.button(
         "📤 Upload",
@@ -22,4 +45,4 @@ def render_upload_panel() -> tuple[object, bool]:
 
     st.divider()
 
-    return uploaded_file, upload
+    return uploaded_files, upload
