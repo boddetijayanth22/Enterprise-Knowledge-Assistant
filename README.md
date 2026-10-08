@@ -1,7 +1,7 @@
 # 🚀 Enterprise Knowledge Assistant
 
 \<p *align*="center">
-  \<img src="assets/image.png" alt="Enterprise Knowledge Assistant Banner" width="150%">
+![Enterprise Knowledge Assistant Banner](assets/image.png)
 \</p>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ## 🖥️ Application Preview
 
-![Application](assets/preview.png)
+![Application Preview](assets/preview.png)
 
 ---
 
@@ -135,7 +135,7 @@ The goal of the project is not simply to demonstrate a basic RAG pipeline, but t
 
 # 🏗️ System Architecture
 
-![Architecture](assets/Architecture.png)
+![Architecture](assets/architecture.png)
 
 The system is organized into separate frontend, API, retrieval, service, evaluation, and infrastructure layers.
 
@@ -443,7 +443,7 @@ The system tracks operational information including:
 
 ## Dashboard
 
-![Dashboard](assets/Dashboard.png)
+![Dashboard](assets/dashboard.png)
 
 The dashboard provides an overview of the user's document knowledge base and application activity.
 
@@ -651,7 +651,6 @@ docker compose down
 
 ## 🚀 Usage
 
-
 1. Start the application.
 2. Authenticate with your account.
 3. Upload one or more PDF documents.
@@ -661,7 +660,6 @@ docker compose down
 7. Ask a question about the uploaded documents.
 8. Review the generated answer and source references.
 9. Use the dashboard and knowledge base to manage documents and sessions.
-
 
 ## 🔬 Evaluation
 
