@@ -1,8 +1,8 @@
 # 🚀 Enterprise Knowledge Assistant
 
-\<p *align*="center">
+<p *align*="center">
 ![Enterprise Knowledge Assistant Banner](assets/image.png)
-\</p>
+</p>
 
 <p align="center">
   <strong>A production-inspired, multi-user Retrieval-Augmented Generation (RAG) system for secure document question answering.</strong>
