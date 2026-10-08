@@ -139,6 +139,8 @@ The goal of the project is not simply to demonstrate a basic RAG pipeline, but t
 
 The system is organized into separate frontend, API, retrieval, service, evaluation, and infrastructure layers.
 
+---
+
 ### High-Level Flow
 
 ```text
@@ -197,7 +199,7 @@ The system is organized into separate frontend, API, retrieval, service, evaluat
 
 The retrieval system is designed as a configurable multi-strategy pipeline rather than depending on a single search method.
 
-1. Document Processing
+## 1. Document Processing
 
 PDF documents are uploaded through the Streamlit interface and processed by the backend.
 
@@ -215,7 +217,7 @@ Qdrant
 ```
 The current chunking configuration uses recursive splitting with a chunk size of approximately 1000 characters and 200 characters of overlap.
 
-2. Semantic Retrieval
+## 2. Semantic Retrieval
 
 Semantic retrieval uses dense vector embeddings to identify chunks that are conceptually similar to the user's query.
 ```text
@@ -223,7 +225,7 @@ BAAI/bge-small-en-v1.5
 ```
 This approach is useful when the query and document use different wording but express similar concepts.
 
-3. BM25 Retrieval
+## 3. BM25 Retrieval
 
 BM25 provides keyword-based retrieval.
 This is particularly useful when a query contains:
@@ -233,7 +235,7 @@ This is particularly useful when a query contains:
 - Specific phrases
 - Keywords that may not be strongly represented by semantic similarity
 
-4. Hybrid Retrieval
+## 4. Hybrid Retrieval
 
 Hybrid retrieval combines semantic and BM25 candidates.
 The system uses Reciprocal Rank Fusion (RRF) to combine rankings from the different retrieval strategies.
@@ -244,7 +246,7 @@ BM25 Search ─────────┘
 ```
 This provides a balance between semantic relevance and exact keyword matching.
 
-5. CrossEncoder Re-ranking
+## 5. CrossEncoder Re-ranking
 
 The retrieved candidate set can then be passed through a CrossEncoder to obtain a more precise relevance ordering.
 ```text
@@ -262,7 +264,7 @@ cross-encoder/ms-marco-MiniLM-L-6-v2
 ```
 The CrossEncoder is used as a ranking model rather than treating its raw score as a probability.
 
-6. Page-Level Context Expansion
+## 6. Page-Level Context Expansion
 
 During evaluation, a retrieval failure mode was identified where an answer could span multiple chunks from the same document page.
 
@@ -480,7 +482,7 @@ Responses are generated using retrieved document context and include source refe
 ---
 
 ## 🛠️ Technology Stack
-```text
+
 | Category | Technology |
 |---|---|
 | Language | Python 3.13 |
@@ -500,7 +502,6 @@ Responses are generated using retrieved document context and include source refe
 | Configuration | Pydantic Settings |
 | Containerization | Docker / Docker Compose |
 | Evaluation | Precision@K, Recall@K, MRR |
-```
 
 ---
 
@@ -650,6 +651,7 @@ docker compose down
 
 ## 🚀 Usage
 
+
 1. Start the application.
 2. Authenticate with your account.
 3. Upload one or more PDF documents.
@@ -659,6 +661,7 @@ docker compose down
 7. Ask a question about the uploaded documents.
 8. Review the generated answer and source references.
 9. Use the dashboard and knowledge base to manage documents and sessions.
+
 
 ## 🔬 Evaluation
 
